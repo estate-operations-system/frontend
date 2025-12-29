@@ -2,8 +2,10 @@
   <div>
     <h1>Тестирование API пользователей</h1>
     
-    <button @click="checkServer">Проверить сервер</button>
-    <button @click="getAllUsers">Получить всех пользователей</button>
+    <ServerControls 
+      @check-server="checkServer"
+      @get-all-users="getAllUsers"
+    />
 
     <UserForm v-model:user="newUser" title="Создать пользователя">
       <button @click="createUser">Создать</button>
@@ -30,9 +32,11 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import UserForm from '../components/UserForm.vue'
 import UserOperations from '../components/UserOperations.vue'
 import ResponseDisplay from '../components/ResponseDisplay.vue'
+import ServerControls from '../components/ServerControls.vue'
 
 const BASE_URL = 'http://localhost:4000'
 
