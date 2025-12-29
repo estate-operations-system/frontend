@@ -22,16 +22,17 @@
       title="Данные для обновления:"
     />
     
-    <h3>Ответ сервера:</h3>
-    <pre>{{ response }}</pre>
-    
-    <p>Статус: {{ status }}</p>
+    <ResponseDisplay 
+      :response="response"
+      :status="status"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import UserForm from '../components/UserForm.vue'
 import UserOperations from '../components/UserOperations.vue'
+import ResponseDisplay from '../components/ResponseDisplay.vue'
 
 const BASE_URL = 'http://localhost:4000'
 
