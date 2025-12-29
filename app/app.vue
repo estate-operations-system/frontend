@@ -9,11 +9,12 @@
       <button @click="createUser">Создать</button>
     </UserForm>
 
-    <h3>Работа с конкретным пользователем (ID):</h3>
-    <input v-model="userId" placeholder="Введите ID" type="number" />
-    <button @click="getUserById">Получить по ID</button>
-    <button @click="updateUser">Обновить</button>
-    <button @click="deleteUser">Удалить</button>
+    <UserOperations 
+      v-model:userId="userId"
+      @get-user="getUserById"
+      @update-user="updateUser"
+      @delete-user="deleteUser"
+    />
     
     <UserForm 
       v-if="userId" 
@@ -30,6 +31,7 @@
 
 <script setup lang="ts">
 import UserForm from '../components/UserForm.vue'
+import UserOperations from '../components/UserOperations.vue'
 
 const BASE_URL = 'http://localhost:4000'
 
