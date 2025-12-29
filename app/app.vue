@@ -5,10 +5,9 @@
     <button @click="checkServer">Проверить сервер</button>
     <button @click="getAllUsers">Получить всех пользователей</button>
 
-    <input v-model="newUser.name" placeholder="Имя" />
-    <input v-model="newUser.email" placeholder="Email" type="email" />
-    <input v-model="newUser.age" placeholder="Возраст" type="number" />
-    <button @click="createUser">Создать</button>
+    <UserForm v-model:user="newUser" title="Создать пользователя">
+      <button @click="createUser">Создать</button>
+    </UserForm>
 
     <h3>Работа с конкретным пользователем (ID):</h3>
     <input v-model="userId" placeholder="Введите ID" type="number" />
@@ -16,12 +15,12 @@
     <button @click="updateUser">Обновить</button>
     <button @click="deleteUser">Удалить</button>
     
-    <div v-if="userId">
-      <h4>Данные для обновления:</h4>
-      <input v-model="updateData.name" placeholder="Новое имя" />
-      <input v-model="updateData.email" placeholder="Новый email" type="email" />
-      <input v-model="updateData.age" placeholder="Новый возраст" type="number" />
-    </div>
+    <UserForm 
+      v-if="userId" 
+      v-model:user="updateData" 
+      title="Данные для обновления:"
+    />
+    
     <h3>Ответ сервера:</h3>
     <pre>{{ response }}</pre>
     
@@ -30,18 +29,20 @@
 </template>
 
 <script setup lang="ts">
+import UserForm from '../components/UserForm.vue'
+
 const BASE_URL = 'http://localhost:4000'
 
 const userId = ref('')
 const newUser = ref({
   name: '',
   email: '',
-  age: ''
+  age: 0
 })
 const updateData = ref({
   name: '',
   email: '',
-  age: ''
+  age: 0
 })
 
 const response = ref('')
@@ -90,7 +91,7 @@ const createUser = async () => {
     newUser.value = {
       name: '',
       email: '',
-      age: ''
+      age: 0
     }
   } catch (error) {
     status.value = `Ошибка: ${(error as Error).message}`
@@ -160,7 +161,11 @@ const deleteUser = async () => {
     status.value = `Успех, статус: ${res.status}`
     
     userId.value = ''
-    updateData.value = { name: '', email: '', age: '' }
+    updateData.value = {
+      name: '',
+      email: '',
+      age: 0
+    }
   } catch (error) {
     status.value = `Ошибка: ${(error as Error).message}`
     response.value = (error as Error).toString()
