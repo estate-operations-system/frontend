@@ -1,21 +1,29 @@
 <template>
-  <div>
+  <div class="container">
     <h1>Тестирование API пользователей</h1>
     
     <ServerControls 
-      @check-server="checkServer"
-      @get-all-users="getAllUsers"
+      @check-server="handleCheckServer"
+      @get-all-users="handleGetAllUsers"
     />
 
     <UserForm v-model:user="newUser" title="Создать пользователя">
-      <button @click="createUser">Создать</button>
+      <template #default="{ user }">
+        <button 
+          @click="handleCreateUser(user)" 
+          :disabled="!isValidUser(user)"
+          class="create-btn"
+        >
+          Создать
+        </button>
+      </template>
     </UserForm>
 
     <UserOperations 
       v-model:userId="userId"
-      @get-user="getUserById"
-      @update-user="updateUser"
-      @delete-user="deleteUser"
+      @get-user="handleGetUserById"
+      @update-user="handleUpdateUser"
+      @delete-user="handleDeleteUser"
     />
     
     <UserForm 
@@ -33,20 +41,29 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import ServerControls from '../components/ServerControls.vue'
 import UserForm from '../components/UserForm.vue'
 import UserOperations from '../components/UserOperations.vue'
 import ResponseDisplay from '../components/ResponseDisplay.vue'
-import ServerControls from '../components/ServerControls.vue'
+import { useUserApi } from '../composables/useUserApi'
+import type { User } from '../types/user'
 
-const BASE_URL = 'http://localhost:4000'
+const { 
+  checkServer, 
+  getAllUsers, 
+  getUserById, 
+  createUser, 
+  updateUser, 
+  deleteUser 
+} = useUserApi()
 
 const userId = ref('')
-const newUser = ref({
+const newUser = ref<User>({
   name: '',
   email: '',
   age: 0
 })
-const updateData = ref({
+const updateData = ref<User>({
   name: '',
   email: '',
   age: 0
@@ -55,127 +72,63 @@ const updateData = ref({
 const response = ref('')
 const status = ref('')
 
-const checkServer = async () => {
-  try {
-    status.value = 'Запрос отправляется...'
-    const res = await fetch(BASE_URL)
-    const data = await res.text()
-    response.value = data
-    status.value = `Успех: статус ${res.status}`
-  } catch (error) {
-    status.value = `Ошибка: ${(error as Error).message}`
-    response.value = (error as Error).toString()
-  }
+const isValidUser = (user: User): boolean => {
+  return !!user.name.trim() && 
+         !!user.email.trim() && 
+         user.age > 0
 }
 
-const getAllUsers = async () => {
-  try {
-    status.value = 'Получаем пользователей...'
-    const res = await fetch(`${BASE_URL}/api/users`)
-    const data = await res.json()
-    response.value = JSON.stringify(data, null, 2)
-    status.value = `Успех: статус: ${res.status}`
-  } catch (error) {
-    status.value = `Ошибка: ${(error as Error).message}`
-    response.value = (error as Error).toString()
-  }
-}
-
-const createUser = async () => {
-  try {
-    status.value = 'Создаем пользователя...'
-    const res = await fetch(`${BASE_URL}/api/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newUser.value)
-    })
-    const data = await res.json()
-    response.value = JSON.stringify(data, null, 2)
-    status.value = `Успех, статус: ${res.status}`
-    
-    newUser.value = {
-      name: '',
-      email: '',
-      age: 0
+const handleApiResponse = <T>(
+  promise: Promise<{ data?: T; error?: string; status: number }>,
+  successMessage: string
+) => {
+  status.value = 'Выполняется запрос...'
+  
+  promise.then(({ data, error, status: responseStatus }) => {
+    if (error) {
+      status.value = `Ошибка: ${error}`
+      response.value = JSON.stringify({ error }, null, 2)
+    } else {
+      status.value = `${successMessage} (статус: ${responseStatus})`
+      response.value = JSON.stringify(data, null, 2)
     }
-  } catch (error) {
-    status.value = `Ошибка: ${(error as Error).message}`
-    response.value = (error as Error).toString()
-  }
+  }).catch((error) => {
+    status.value = `Неожиданная ошибка: ${error.message}`
+    response.value = error.toString()
+  })
 }
 
-const getUserById = async () => {
-  if (!userId.value) {
-    status.value = 'Введите ID пользователя'
+const handleCheckServer = () => {
+  handleApiResponse(checkServer(), 'Сервер доступен')
+}
+
+const handleGetAllUsers = () => {
+  handleApiResponse(getAllUsers(), 'Пользователи получены')
+}
+
+const handleCreateUser = (user: User) => {
+  handleApiResponse(createUser(user), 'Пользователь создан')
+  
+  newUser.value = { name: '', email: '', age: 0 }
+}
+
+const handleGetUserById = (id: string) => {
+  handleApiResponse(getUserById(id), 'Пользователь получен')
+}
+
+const handleUpdateUser = (id: string) => {
+  if (!isValidUser(updateData.value)) {
+    status.value = 'Заполните все поля для обновления'
     return
   }
   
-  try {
-    status.value = `Получаем пользователя с ID ${userId.value}...`
-    const res = await fetch(`${BASE_URL}/api/users/${userId.value}`)
-    const data = await res.json()
-    response.value = JSON.stringify(data, null, 2)
-    status.value = `Успех, статус: ${res.status}`
-    
-    if (data) {
-      updateData.value = { ...data }
-    }
-  } catch (error) {
-    status.value = `Ошибка: ${(error as Error).message}`
-    response.value = (error as Error).toString()
-  }
+  handleApiResponse(updateUser(id, updateData.value), 'Пользователь обновлен')
 }
 
-const updateUser = async () => {
-  if (!userId.value) {
-    status.value = 'Введите ID пользователя для обновления'
-    return
-  }
+const handleDeleteUser = (id: string) => {
+  handleApiResponse(deleteUser(id), 'Пользователь удален')
   
-  try {
-    status.value = `Обновляем пользователя с ID ${userId.value}...`
-    const res = await fetch(`${BASE_URL}/api/users/${userId.value}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updateData.value)
-    })
-    const data = await res.json()
-    response.value = JSON.stringify(data, null, 2)
-    status.value = `Успех, статус: ${res.status}`
-  } catch (error) {
-    status.value = `Ошибка: ${(error as Error).message}`
-    response.value = (error as Error).toString()
-  }
-}
-
-const deleteUser = async () => {
-  if (!userId.value) {
-    status.value = 'Введите ID пользователя для удаления'
-    return
-  }
-  
-  try {
-    status.value = `Удаляем пользователя с ID ${userId.value}...`
-    const res = await fetch(`${BASE_URL}/api/users/${userId.value}`, {
-      method: 'DELETE'
-    })
-    const data = await res.json()
-    response.value = JSON.stringify(data, null, 2)
-    status.value = `Успех, статус: ${res.status}`
-    
-    userId.value = ''
-    updateData.value = {
-      name: '',
-      email: '',
-      age: 0
-    }
-  } catch (error) {
-    status.value = `Ошибка: ${(error as Error).message}`
-    response.value = (error as Error).toString()
-  }
+  userId.value = ''
+  updateData.value = { name: '', email: '', age: 0 }
 }
 </script>
