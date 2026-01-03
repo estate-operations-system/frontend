@@ -26,7 +26,6 @@ export async function apiRequest<T>(
         status: response.status
       }
     } catch (jsonError) {
-      // Если не JSON, получаем как текст
       const text = await response.text()
       
       if (!response.ok) {
