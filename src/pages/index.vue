@@ -1,7 +1,6 @@
 <template>
-  <ServerStatus />
+  <div>Главная</div>
 </template>
 
 <script setup lang="ts">
-import { ServerStatus } from '@/widgets/server-status'
 </script>
