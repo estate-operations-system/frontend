@@ -3,11 +3,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   srcDir: 'src/',
+  ssr: false,
   runtimeConfig: {
     serverUrl: '',
 
     public: {
-      serverUrl: process.env.NUXT_PUBLIC_SERVER_URL
+      apiBase: 'https://backend-pl4x.onrender.com/'
     }
   }
 })
