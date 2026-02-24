@@ -10,5 +10,12 @@ export default defineNuxtConfig({
     public: {
       apiBase: 'https://backend-pl4x.onrender.com/'
     }
+  },
+  css: [
+    'eos-ui-kit/dist/style.css'
+  ],
+  
+  build: {
+    transpile: ['eos-ui-kit']
   }
 })
