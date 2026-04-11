@@ -1,13 +1,51 @@
 <template>
   <div class="tickets-container">
-    <div class="header">
-      <Breadcrumb :items="[
-        { label: 'Главная', to: '/' },
-        { label: 'Заявки' }
-      ]" />
-
+    <div class="title-block">
       <h1 class="page-title">Заявки</h1>
-      <p class="page-subtitle">Управление заявками от жильцов</p>
+      <Button @click="openCreateModal">Создать заявку</Button>
+    </div>
+
+    <div v-if="isCreateModalOpen" class="modal-overlay" @click.self="closeCreateModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Создать заявку</h2>
+          <Button size="sm" variant="secondary" @click="closeCreateModal">Закрыть</Button>
+        </div>
+
+        <form class="create-form" @submit.prevent="submitTicket">
+          <div class="field-grid">
+            <div class="field">
+              <label for="category">Категория</label>
+              <input id="category" v-model.trim="form.category" type="text" placeholder="Например, Сантехника" required>
+            </div>
+
+            <div class="field">
+              <label for="resident_id">ID жильца</label>
+              <input id="resident_id" v-model.number="form.resident_id" type="number" min="1" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="address">Адрес</label>
+            <input id="address" v-model.trim="form.address" type="text" placeholder="ул. Ленина, 10, кв. 25" required>
+          </div>
+
+          <div class="field">
+            <label for="description">Описание</label>
+            <textarea id="description" v-model.trim="form.description" rows="3" placeholder="Опишите проблему" required />
+          </div>
+
+          <Alert v-if="createError" type="error" title="Ошибка создания" closeable @close="createError = null">
+            {{ createError }}
+          </Alert>
+
+          <div class="actions">
+            <Button type="submit" :disabled="creating">
+              {{ creating ? 'Создание...' : 'Создать заявку' }}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <Spinner v-if="loading" label="Загрузка заявок..." />
@@ -75,6 +113,20 @@ const api = new ApiClient('https://backend-pl4x.onrender.com')
 const tickets = ref<Ticket[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const isCreateModalOpen = ref(false)
+const creating = ref(false)
+const createError = ref<string | null>(null)
+const form = ref({
+  category: '',
+  description: '',
+  address: '',
+  resident_id: undefined as number | undefined
+})
+
+const fetchTickets = async () => {
+  const res = await api.getTickets()
+  tickets.value = res.data ?? []
+}
 
 const formatDate = (date: string | undefined) => {
   if (!date) return '-'
@@ -99,14 +151,56 @@ const getBadgeVariant = (status: string | undefined): 'primary' | 'secondary' | 
 
 onMounted(async () => {
   try {
-    const res = await api.getTickets()
-    tickets.value = res.data ?? []
+    await fetchTickets()
   } catch (e: any) {
     error.value = e.message || 'Ошибка загрузки'
   } finally {
     loading.value = false
   }
 })
+
+const submitTicket = async () => {
+  createError.value = null
+
+  if (!form.value.category || !form.value.address || !form.value.description || !form.value.resident_id) {
+    createError.value = 'Заполните категорию, адрес, описание и ID жильца'
+    return
+  }
+
+  creating.value = true
+
+  try {
+    await api.createTicket({
+      category: form.value.category,
+      description: form.value.description,
+      address: form.value.address,
+      resident_id: form.value.resident_id
+    })
+
+    form.value = {
+      category: '',
+      description: '',
+      address: '',
+      resident_id: undefined
+    }
+
+    await fetchTickets()
+    closeCreateModal()
+  } catch (e: any) {
+    createError.value = e.message || 'Не удалось создать заявку'
+  } finally {
+    creating.value = false
+  }
+}
+
+const openCreateModal = () => {
+  createError.value = null
+  isCreateModalOpen.value = true
+}
+
+const closeCreateModal = () => {
+  isCreateModalOpen.value = false
+}
 </script>
 
 <style scoped>
@@ -115,21 +209,94 @@ onMounted(async () => {
   margin: 0 auto;
 }
 
-.header {
-  margin-bottom: var(--eos-space-2xl);
+.title-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eos-space-m);
+  margin-bottom: var(--eos-space-l);
+}
+
+.create-form {
+  display: grid;
+  gap: var(--eos-space-m);
+}
+
+.field-grid {
+  display: grid;
+  gap: var(--eos-space-m);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field {
+  display: grid;
+  gap: var(--eos-space-xs);
+}
+
+.field label {
+  font-size: var(--eos-font-size-s);
+  color: var(--eos-color-text-secondary);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--eos-color-border);
+  border-radius: var(--eos-radius-m);
+  background-color: var(--eos-color-bg-primary);
+  color: var(--eos-color-text);
+  padding: var(--eos-space-s) var(--eos-space-m);
+  font-size: var(--eos-font-size-m);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  padding: var(--eos-space-m);
+}
+
+.modal {
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: var(--eos-radius-l);
+  border: 1px solid var(--eos-color-border);
+  background: white;
+  padding: var(--eos-space-l);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--eos-space-m);
+}
+
+.modal-title {
+  font-size: var(--eos-font-size-l);
+  margin: 0;
 }
 
 .page-title {
   font-size: var(--eos-font-size-2xl);
   font-weight: var(--eos-font-weight-bold);
   color: var(--eos-color-primary);
-  margin-bottom: var(--eos-space-s);
-  margin-top: var(--eos-space-l);
-}
-
-.page-subtitle {
-  font-size: var(--eos-font-size-m);
-  color: var(--eos-color-text-secondary);
+  margin: 0;
 }
 
 .table-header {
@@ -225,6 +392,25 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .tickets-container {
     padding: 0;
+  }
+
+  .title-block {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .modal {
+    padding: var(--eos-space-m);
+  }
+
+  .modal-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--eos-space-s);
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
   }
 
   .page-title {
