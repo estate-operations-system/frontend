@@ -174,7 +174,8 @@ const submitTicket = async () => {
       category: form.value.category,
       description: form.value.description,
       address: form.value.address,
-      resident_id: form.value.resident_id
+      resident_id: form.value.resident_id,
+      status: 'open'
     })
 
     form.value = {

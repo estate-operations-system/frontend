@@ -24,7 +24,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
-import { useRuntimeConfig } from "#app";
 
 declare global {
   interface Window {
@@ -32,8 +31,7 @@ declare global {
   }
 }
 
-const config = useRuntimeConfig();
-const BOT_TOKEN = config.public.botToken;
+const BOT_TOKEN = import.meta.env.VITE_BOT_TOKEN;
 
 const isLoggedIn = computed(() => !!localStorage.getItem('token'));
 
@@ -60,7 +58,7 @@ const loginWithTelegram = () => {
   const origin = encodeURIComponent(window.location.origin);
   const redirectUrl = encodeURIComponent(window.location.href);
   
-  const authUrl = `https://oauth.telegram.org/auth?bot_id=${BOT_TOKEN}&origin=${origin}&return_to=${redirectUrl}&request_access=write`;
+  const authUrl = `https://oauth.telegram.org/auth?bot_id=${import.meta.env.VITE_BOT_TOKEN}&origin=${origin}&return_to=${redirectUrl}&request_access=write`;
   const popup = window.open(authUrl, 'telegram_auth', 
     `width=${width},height=${height},left=${left},top=${top}`
   );
