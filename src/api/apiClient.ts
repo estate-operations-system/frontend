@@ -347,4 +347,29 @@ export class ApiClient {
       }
     )
   }
+
+  async createTicket(payload: paths['/api/tickets']['post']['requestBody']['content']['application/json']) {
+    const requestPayload = {
+      ...payload,
+      status: 'open'
+    }
+
+    const res = await fetch(`${this.baseUrl}/api/tickets`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestPayload)
+    })
+
+    const json = await res.json()
+
+    if (!res.ok) {
+      const errorMessage = json?.error || `Error creating ticket: ${res.statusText}`
+      throw new Error(errorMessage)
+    }
+
+    const data: paths['/api/tickets']['post']['responses'][201]['content']['application/json'] = json
+    return data
+  }
 }
