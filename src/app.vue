@@ -8,10 +8,10 @@
           <NuxtLink to="/users" class="nav-link">Пользователи</NuxtLink>
           <NuxtLink to="/tickets" class="nav-link">Заявки</NuxtLink>
         </div>
-        <button v-if="isLoggedIn" @click="logout" class="logout-btn">
+        <button v-if="isLoggedIn" @click="handleLogout" class="logout-btn" :disabled="isLoading">
           Выйти
         </button>
-        <button v-else @click="loginWithTelegram" class="telegram-login-btn">
+        <button v-else @click="loginWithTelegram" class="telegram-login-btn" :disabled="isLoading">
           Войти через Telegram
         </button>
       </div>
@@ -23,7 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted } from "vue";
+import { useAuth } from "~/composables/useAuth";
 
 declare global {
   interface Window {
@@ -31,13 +32,17 @@ declare global {
   }
 }
 
+const { isLoggedIn, logout, authenticateWithTelegram, isLoading } = useAuth()
+
 const BOT_TOKEN = import.meta.env.VITE_BOT_TOKEN;
 
-const isLoggedIn = computed(() => !!localStorage.getItem('token'));
-
-const logout = () => {
-  localStorage.removeItem('token');
-  window.location.reload();
+const handleLogout = async () => {
+  try {
+    await logout()
+    window.location.reload()
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
 };
 
 onMounted(() => {
@@ -58,7 +63,7 @@ const loginWithTelegram = () => {
   const origin = encodeURIComponent(window.location.origin);
   const redirectUrl = encodeURIComponent(window.location.href);
   
-  const authUrl = `https://oauth.telegram.org/auth?bot_id=${import.meta.env.VITE_BOT_TOKEN}&origin=${origin}&return_to=${redirectUrl}&request_access=write`;
+  const authUrl = `https://oauth.telegram.org/auth?bot_id=${BOT_TOKEN}&origin=${origin}&return_to=${redirectUrl}&request_access=write`;
   const popup = window.open(authUrl, 'telegram_auth', 
     `width=${width},height=${height},left=${left},top=${top}`
   );
@@ -96,17 +101,8 @@ const loginWithTelegram = () => {
 
 const handleTelegramAuth = async (user: any) => {
   try {
-    const response = await fetch('https://backend-pl4x.onrender.com/api/auth/telegram', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(user)
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      localStorage.setItem('token', result.token);
-    }
+    await authenticateWithTelegram(user);
+    window.location.reload();
   } catch (error) {
     console.error('Auth failed:', error);
   }
@@ -130,6 +126,11 @@ const handleTelegramAuth = async (user: any) => {
   background-color: #006699;
 }
 
+.telegram-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .logout-btn {
   background-color: #dc2626;
   color: white;
@@ -144,6 +145,11 @@ const handleTelegramAuth = async (user: any) => {
 
 .logout-btn:hover {
   background-color: #b91c1c;
+}
+
+.logout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>
 

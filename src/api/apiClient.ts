@@ -52,9 +52,12 @@ interface RequestOptions extends RequestInit {
 export class ApiClient {
   private readonly baseUrl: string
   private readonly tokenKey = 'token'
+  private readonly refreshTokenKey = 'refreshToken'
   private readonly contentType = 'application/json'
   private readonly maxRetries = 3
   private readonly retryDelay = 1000
+  private isRefreshing = false
+  private refreshPromise: Promise<{ token: string; refreshToken: string } | null> | null = null
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || this.getBaseUrl()
@@ -70,6 +73,58 @@ export class ApiClient {
   private getAuthHeaders(): Record<string, string> {
     const token = localStorage.getItem(this.tokenKey)
     return token ? { 'Authorization': `Bearer ${token}` } : {}
+  }
+
+  private async refreshTokens(): Promise<{ token: string; refreshToken: string } | null> {
+    // Если уже идет refresh, ждем его результата
+    if (this.isRefreshing && this.refreshPromise) {
+      return this.refreshPromise
+    }
+
+    this.isRefreshing = true
+
+    this.refreshPromise = (async () => {
+      try {
+        const refreshToken = localStorage.getItem(this.refreshTokenKey)
+        if (!refreshToken) {
+          return null
+        }
+
+        const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': this.contentType,
+          },
+          body: JSON.stringify({ refreshToken }),
+        })
+
+        if (!response.ok) {
+          localStorage.removeItem(this.tokenKey)
+          localStorage.removeItem(this.refreshTokenKey)
+          return null
+        }
+
+        const data = await response.json()
+
+        if (data.token && data.refreshToken) {
+          localStorage.setItem(this.tokenKey, data.token)
+          localStorage.setItem(this.refreshTokenKey, data.refreshToken)
+          return { token: data.token, refreshToken: data.refreshToken }
+        }
+
+        return null
+      } catch (error) {
+        console.error('Token refresh failed:', error)
+        localStorage.removeItem(this.tokenKey)
+        localStorage.removeItem(this.refreshTokenKey)
+        return null
+      } finally {
+        this.isRefreshing = false
+        this.refreshPromise = null
+      }
+    })()
+
+    return this.refreshPromise
   }
 
   private async _request<T>(
@@ -89,6 +144,37 @@ export class ApiClient {
 
     try {
       const response = await fetch(url, finalOptions)
+
+      // Обработка 401: попытка обновить токен и повторить запрос
+      if (response.status === 401) {
+        const refreshed = await this.refreshTokens()
+
+        if (refreshed) {
+          // Повторить запрос с новыми токенами
+          const retryOptions: RequestInit = {
+            headers: {
+              [this.contentType === 'application/json' ? 'Content-Type' : 'content-type']: this.contentType,
+              ...this.getAuthHeaders(),
+              ...fetchOptions.headers,
+            },
+            ...fetchOptions,
+          }
+
+          const retryResponse = await fetch(url, retryOptions)
+
+          if (!retryResponse.ok) {
+            const body = await retryResponse.json().catch(() => ({}))
+            const errorMessage = body?.error || body?.message || retryResponse.statusText
+            throw new Error(errorMessage)
+          }
+
+          return retryResponse.json() as Promise<T>
+        } else {
+          // Refresh не удался, перенаправить на логин
+          window.location.href = '/'
+          throw new Error('Session expired. Please login again.')
+        }
+      }
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}))
@@ -250,5 +336,15 @@ export class ApiClient {
       credentials: 'include',
       body: JSON.stringify(telegramData),
     })
+  }
+
+  async refreshToken(refreshToken: string) {
+    return this._request<{ token: string; refreshToken: string }>(
+      `${this.baseUrl}/api/auth/refresh`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ refreshToken }),
+      }
+    )
   }
 }
