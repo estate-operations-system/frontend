@@ -8,8 +8,13 @@
           <NuxtLink to="/users" class="nav-link">Пользователи</NuxtLink>
           <NuxtLink to="/tickets" class="nav-link">Заявки</NuxtLink>
         </div>
+        <button v-if="isLoggedIn" @click="handleLogout" class="logout-btn" :disabled="isLoading">
+          Выйти
+        </button>
+        <button v-else @click="loginWithTelegram" class="telegram-login-btn" :disabled="isLoading">
+          Войти через Telegram
+        </button>
       </div>
-      <Input />
     </nav>
     <main class="main-content">
       <NuxtPage />
@@ -18,7 +23,135 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
+import { useAuth } from "~/composables/useAuth";
+
+declare global {
+  interface Window {
+    Telegram?: any;
+  }
+}
+
+const { isLoggedIn, logout, authenticateWithTelegram, isLoading } = useAuth()
+
+const BOT_TOKEN = import.meta.env.VITE_BOT_TOKEN;
+
+const handleLogout = async () => {
+  try {
+    await logout()
+    window.location.reload()
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
+};
+
+onMounted(() => {
+  if (!window.Telegram) {
+    const script = document.createElement('script');
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+});
+
+const loginWithTelegram = () => {
+  const width = 550;
+  const height = 470;
+  const left = Math.max(0, (screen.width - width) / 2);
+  const top = Math.max(0, (screen.height - height) / 2);
+  
+  const origin = encodeURIComponent(window.location.origin);
+  const redirectUrl = encodeURIComponent(window.location.href);
+  
+  const authUrl = `https://oauth.telegram.org/auth?bot_id=${BOT_TOKEN}&origin=${origin}&return_to=${redirectUrl}&request_access=write`;
+  const popup = window.open(authUrl, 'telegram_auth', 
+    `width=${width},height=${height},left=${left},top=${top}`
+  );
+  
+  const handleMessage = (event: MessageEvent) => {
+    if (event.origin !== 'https://oauth.telegram.org') return;
+    
+    try {
+      const data = JSON.parse(event.data);
+      if (data.event === 'auth_result') {        
+        if (data.result && data.result.id) {
+          handleTelegramAuth(data.result);
+          
+          if (popup && !popup.closed) {
+            popup.close();
+          }
+          
+          window.removeEventListener('message', handleMessage);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse message:', e);
+    }
+  };
+  
+  window.addEventListener('message', handleMessage);
+  
+  const checkClosed = setInterval(() => {
+    if (popup && popup.closed) {
+      clearInterval(checkClosed);
+      window.removeEventListener('message', handleMessage);
+    }
+  }, 500);
+};
+
+const handleTelegramAuth = async (user: any) => {
+  try {
+    await authenticateWithTelegram(user);
+    window.location.reload();
+  } catch (error) {
+    console.error('Auth failed:', error);
+  }
+};
 </script>
+
+<style scoped>
+.telegram-login-btn {
+  background-color: #0088cc;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.telegram-login-btn:hover {
+  background-color: #006699;
+}
+
+.telegram-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.logout-btn {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #b91c1c;
+}
+
+.logout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+</style>
 
 <style lang="css">
 :root {

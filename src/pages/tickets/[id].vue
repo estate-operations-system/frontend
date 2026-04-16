@@ -83,7 +83,6 @@ const route = useRoute()
 
 const ticket = ref<Ticket | null>(null)
 const loading = ref(true)
-const error = ref<string | null>(null)
 
 const formatDate = (date: string | undefined) => {
   if (!date) return '-'
