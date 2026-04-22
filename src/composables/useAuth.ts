@@ -119,6 +119,68 @@ export const useAuth = () => {
     }
   }
 
+  const sendVerificationCode = async (
+    email: string,
+    telegramId: string,
+    name: string
+  ): Promise<{ success: boolean; message: string }> => {
+    isLoading.value = true
+    errorMessage.value = null
+
+    try {
+      const response = await apiClient.sendVerificationCode(email, telegramId, name) as any
+
+      if (response?.success) {
+        return {
+          success: true,
+          message: response.message || 'Код отправлен на ваш email',
+        }
+      } else {
+        throw new Error(response?.error || 'Failed to send verification code')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to send verification code'
+      errorMessage.value = message
+      console.error('Send verification code failed:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const verifyCode = async (
+    email: string,
+    code: string,
+    telegramId: string,
+    name: string
+  ): Promise<AuthResponse> => {
+    isLoading.value = true
+    errorMessage.value = null
+
+    try {
+      const response = await apiClient.verifyCode(email, code, telegramId, name) as any
+
+      if (response?.success && response?.token && response?.refreshToken) {
+        setToken(response.token, response.refreshToken)
+        return {
+          success: true,
+          token: response.token,
+          refreshToken: response.refreshToken,
+          user: response.data,
+        }
+      } else {
+        throw new Error(response?.error || 'Verification failed')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Verification failed'
+      errorMessage.value = message
+      console.error('Code verification failed:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const clearError = (): void => {
     errorMessage.value = null
   }
@@ -133,6 +195,8 @@ export const useAuth = () => {
     removeToken,
     logout,
     authenticateWithTelegram,
+    sendVerificationCode,
+    verifyCode,
     clearError,
   }
 }

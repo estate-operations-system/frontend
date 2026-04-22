@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "eos-ui-kit": {
+      "signature": "558ef17a881bc1a6fba7a2d91cef8941",
+      "file": true,
+      "replaced": "^0.4.0"
+    }
+  }
+}

@@ -12,20 +12,18 @@
       Заявка не найдена
     </Alert>
 
-    <Card v-else>
-      <template #header>
-        <div class="card-header-content">
-          <div>
-            <h1 class="ticket-title">Заявка #{{ ticket.id }}</h1>
-            <Badge :variant="getBadgeVariant(ticket.status)">
-              {{ ticket.status }}
-            </Badge>
-          </div>
+    <div v-else class="ticket-content">
+      <div class="ticket-header">
+        <div>
+          <h1 class="ticket-title">Заявка #{{ ticket.id }}</h1>
+          <Badge :variant="getBadgeVariant(ticket.status)">
+            {{ ticket.status }}
+          </Badge>
         </div>
-      </template>
+      </div>
 
-      <div class="content-section">
-        <div class="section">
+      <div class="ticket-body">
+        <div class="info-section">
           <h2 class="section-title">Основная информация</h2>
           
           <div class="info-grid">
@@ -50,23 +48,23 @@
           </div>
         </div>
 
-        <div class="section" v-if="ticket.address">
+        <div class="info-section" v-if="ticket.address">
           <h2 class="section-title">Адрес</h2>
           <p class="description-text">{{ ticket.address }}</p>
         </div>
 
-        <div class="section" v-if="ticket.description">
+        <div class="info-section" v-if="ticket.description">
           <h2 class="section-title">Описание</h2>
           <p class="description-text">{{ ticket.description }}</p>
         </div>
       </div>
 
-      <template #footer>
+      <div class="ticket-actions">
         <NuxtLink to="/tickets">
-          <Button variant="secondary">Вернуться к списку</Button>
+          <EosButton variant="secondary">Вернуться к списку</EosButton>
         </NuxtLink>
-      </template>
-    </Card>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -74,6 +72,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
+import { EosButton } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
 type Ticket = components["schemas"]["Ticket"]
@@ -119,94 +118,120 @@ onMounted(async () => {
 </script>
 
 <style lang="css" scoped>
-
 .ticket-container {
-  padding: var(--eos-space-md);
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
+  padding: var(--eos-space-l);
 }
 
-.card-header-content {
+.ticket-content {
+  background: white;
+  border: 1px solid var(--eos-color-border);
+  border-radius: var(--eos-radius-m);
+  padding: var(--eos-space-2xl);
+}
+
+.ticket-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--eos-space-md);
+  align-items: flex-start;
+  margin-bottom: var(--eos-space-2xl);
+  padding-bottom: var(--eos-space-l);
+  border-bottom: 2px solid var(--eos-color-border);
 }
 
 .ticket-title {
   font-size: var(--eos-font-size-2xl);
   font-weight: var(--eos-font-weight-bold);
-  color: var(--eos-text);
-  margin: 0;
+  color: var(--eos-color-primary);
+  margin: 0 0 var(--eos-space-s) 0;
 }
 
-.content-section {
-  padding: var(--eos-space-md) 0;
-  border-bottom: 1px solid var(--eos-border);
+.ticket-body {
+  padding: 0;
 }
 
-.content-section:last-child {
-  border-bottom: none;
+.info-section {
+  padding: var(--eos-space-l) 0;
 }
 
 .section-title {
-  font-size: var(--eos-font-size-lg);
+  font-size: var(--eos-font-size-l);
   font-weight: var(--eos-font-weight-semibold);
-  color: var(--eos-text);
-  margin: 0 0 var(--eos-space-md) 0;
+  color: var(--eos-color-primary);
+  margin: 0 0 var(--eos-space-l) 0;
+  padding-bottom: var(--eos-space-m);
+  border-bottom: 2px solid var(--eos-color-border);
+}
+
+.description-text {
+  font-size: var(--eos-font-size-m);
+  color: var(--eos-color-text);
+  line-height: 1.6;
+  margin: 0;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--eos-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--eos-space-l);
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
+  gap: var(--eos-space-s);
 }
 
 .info-label {
-  font-size: var(--eos-font-size-sm);
+  font-size: var(--eos-font-size-s);
   font-weight: var(--eos-font-weight-semibold);
-  color: var(--eos-text-secondary);
-  margin-bottom: var(--eos-space-xs);
+  color: var(--eos-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .info-value {
-  font-size: var(--eos-font-size-base);
-  color: var(--eos-text);
-  word-break: break-word;
+  font-size: var(--eos-font-size-m);
+  color: var(--eos-color-text);
+  word-break: break-all;
+  margin: 0;
 }
 
 .info-link {
-  color: var(--eos-primary);
+  color: var(--eos-color-primary);
   text-decoration: none;
   transition: color var(--eos-transition-base);
 }
 
 .info-link:hover {
-  color: var(--eos-primary-dark);
+  color: var(--eos-color-primary-dark, #1e40af);
   text-decoration: underline;
+}
+
+.ticket-actions {
+  display: flex;
+  gap: var(--eos-space-m);
+  border-top: 1px solid var(--eos-color-border);
+  padding-top: var(--eos-space-l);
+  margin-top: var(--eos-space-2xl);
 }
 
 @media (max-width: 768px) {
   .ticket-container {
-    padding: var(--eos-space-sm);
+    padding: var(--eos-space-m);
   }
 
-  .card-header-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
+  .ticket-content {
+    padding: var(--eos-space-l);
   }
 
   .ticket-title {
     font-size: var(--eos-font-size-xl);
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

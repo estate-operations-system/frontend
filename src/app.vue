@@ -2,20 +2,17 @@
   <div id="app">
     <nav class="nav">
       <div class="nav-content">
-        <div class="nav-title">Estate Operations</div>
-        <div class="nav-links">
-          <NuxtLink to="/" class="nav-link">Главная</NuxtLink>
-          <NuxtLink to="/users" class="nav-link">Пользователи</NuxtLink>
-          <NuxtLink to="/tickets" class="nav-link">Заявки</NuxtLink>
+        <button @click="goToHome" class="nav-title">Estate Operations</button>
+        <div v-if="isLoggedIn" class="nav-links">
+          <a @click="() => router.push('/users')" class="nav-link">Пользователи</a>
+          <a @click="() => router.push('/tickets')" class="nav-link">Заявки</a>
         </div>
-        <button v-if="isLoggedIn" @click="handleLogout" class="logout-btn" :disabled="isLoading">
-          Выйти
-        </button>
-        <button v-else @click="loginWithTelegram" class="telegram-login-btn" :disabled="isLoading">
-          Войти через Telegram
+        <button v-if="isLoggedIn" @click="goToProfile" class="profile-button">
+          <EosAccountIcon class="profile-icon"/>
         </button>
       </div>
     </nav>
+
     <main class="main-content">
       <NuxtPage />
     </main>
@@ -23,18 +20,21 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
+import { EosAccountIcon } from "eos-ui-kit";
 
-declare global {
-  interface Window {
-    Telegram?: any;
-  }
-}
+const router = useRouter();
+const { isLoggedIn, logout, isLoading } = useAuth();
 
-const { isLoggedIn, logout, authenticateWithTelegram, isLoading } = useAuth()
+const goToHome = () => {
+  router.push('/');
+};
 
-const BOT_TOKEN = import.meta.env.VITE_BOT_TOKEN;
+const goToProfile = () => {
+  router.push('/profile');
+};
 
 const handleLogout = async () => {
   try {
@@ -44,112 +44,34 @@ const handleLogout = async () => {
     console.error('Logout failed:', error)
   }
 };
-
-onMounted(() => {
-  if (!window.Telegram) {
-    const script = document.createElement('script');
-    script.src = 'https://telegram.org/js/telegram-widget.js?22';
-    script.async = true;
-    document.head.appendChild(script);
-  }
-});
-
-const loginWithTelegram = () => {
-  const width = 550;
-  const height = 470;
-  const left = Math.max(0, (screen.width - width) / 2);
-  const top = Math.max(0, (screen.height - height) / 2);
-  
-  const origin = encodeURIComponent(window.location.origin);
-  const redirectUrl = encodeURIComponent(window.location.href);
-  
-  const authUrl = `https://oauth.telegram.org/auth?bot_id=${BOT_TOKEN}&origin=${origin}&return_to=${redirectUrl}&request_access=write`;
-  const popup = window.open(authUrl, 'telegram_auth', 
-    `width=${width},height=${height},left=${left},top=${top}`
-  );
-  
-  const handleMessage = (event: MessageEvent) => {
-    if (event.origin !== 'https://oauth.telegram.org') return;
-    
-    try {
-      const data = JSON.parse(event.data);
-      if (data.event === 'auth_result') {        
-        if (data.result && data.result.id) {
-          handleTelegramAuth(data.result);
-          
-          if (popup && !popup.closed) {
-            popup.close();
-          }
-          
-          window.removeEventListener('message', handleMessage);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to parse message:', e);
-    }
-  };
-  
-  window.addEventListener('message', handleMessage);
-  
-  const checkClosed = setInterval(() => {
-    if (popup && popup.closed) {
-      clearInterval(checkClosed);
-      window.removeEventListener('message', handleMessage);
-    }
-  }, 500);
-};
-
-const handleTelegramAuth = async (user: any) => {
-  try {
-    await authenticateWithTelegram(user);
-    window.location.reload();
-  } catch (error) {
-    console.error('Auth failed:', error);
-  }
-};
 </script>
 
 <style scoped>
-.telegram-login-btn {
-  background-color: #0088cc;
-  color: white;
+.profile-button {
+  background: none;
   border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--eos-transition-base);
 }
 
-.telegram-login-btn:hover {
-  background-color: #006699;
+.profile-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-.telegram-login-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.profile-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-.logout-btn {
-  background-color: #dc2626;
+.profile-icon {
+  width: 24px;
+  height: 24px;
   color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.logout-btn:hover {
-  background-color: #b91c1c;
-}
-
-.logout-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 </style>
 
@@ -208,11 +130,11 @@ const handleTelegramAuth = async (user: any) => {
   --eos-line-height-normal: 1.5;
   --eos-line-height-relaxed: 1.75;
 
-  --eos-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --eos-shadow-s: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --eos-shadow-m: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --eos-shadow-l: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  --eos-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --eos-shadow-xs: none;
+  --eos-shadow-s: none;
+  --eos-shadow-m: none;
+  --eos-shadow-l: none;
+  --eos-shadow-xl: none;
 
   --eos-transition-fast: 150ms ease;
   --eos-transition-base: 200ms ease;
@@ -241,7 +163,6 @@ html, body {
 <style lang="css" scoped>
 .nav {
   background-color: var(--eos-color-primary);
-  box-shadow: var(--eos-shadow-m);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -261,6 +182,19 @@ html, body {
   font-size: var(--eos-font-size-xl);
   font-weight: var(--eos-font-weight-bold);
   color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity var(--eos-transition-base);
+}
+
+.nav-title:hover {
+  opacity: 0.8;
+}
+
+.nav-title:active {
+  opacity: 0.7;
 }
 
 .nav-links {
@@ -270,25 +204,23 @@ html, body {
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  cursor: pointer;
   font-size: var(--eos-font-size-m);
   font-weight: var(--eos-font-weight-medium);
   padding: var(--eos-space-s) var(--eos-space-m);
   border-radius: var(--eos-radius-s);
-  transition: all var(--eos-transition-fast);
-  position: relative;
-  text-decoration: none;
+  transition: all var(--eos-transition-base);
 }
 
 .nav-link:hover {
-  color: white;
+  color: rgba(255, 255, 255, 0.95);
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.nav-link.router-link-active {
-  color: white;
-  background-color: rgba(255, 255, 255, 0.2);
-  font-weight: var(--eos-font-weight-semibold);
+.nav-link:active {
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .main-content {
@@ -315,5 +247,10 @@ html, body {
   .main-content {
     padding: var(--eos-space-m);
   }
+}
+
+
+.profile-icon {
+  color: white;
 }
 </style>
