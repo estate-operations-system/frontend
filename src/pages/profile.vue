@@ -1,7 +1,6 @@
 <template>
   <div class="profile-page">
     <div class="profile-container">
-      <!-- Authorized User -->
       <div v-if="isLoggedIn" class="profile-content">
         <div class="profile-header">
           <div class="profile-icon-large" />
@@ -20,16 +19,13 @@
         </div>
       </div>
 
-      <!-- Not Authorized User -->
       <div v-else class="auth-content">
         <div class="auth-header">
           <h1>Вход в систему</h1>
           <p>Выберите способ авторизации</p>
         </div>
         
-        <!-- Auth Methods Container -->
         <div class="auth-methods-container">
-          <!-- Telegram Widget -->
           <div class="telegram-section">
             <div class="telegram-widget-container">
               <div 
@@ -40,7 +36,6 @@
             <p v-if="authStatus" :class="authStatusClass">{{ authStatus }}</p>
           </div>
 
-          <!-- Email Button -->
           <div class="email-section">
             <button @click="loginWithEmail" class="auth-method-button email">
               <span class="auth-method-text">Вход через Email</span>
@@ -67,7 +62,6 @@ const authStatus = ref('');
 const authStatusClass = ref('');
 const botUsername = ref(config.public.telegramBotUsername || 'your_bot_username');
 
-// Глобальная функция для Telegram виджета
 (window as any).onTelegramAuthProfile = async (user: any) => {
   console.log('Telegram auth callback received:', user);
   authStatus.value = 'Отправка данных на сервер...';
@@ -187,7 +181,6 @@ onMounted(() => {
   padding: var(--eos-space-2xl);
 }
 
-/* Authorized User Profile */
 .profile-header {
   display: flex;
   flex-direction: column;
@@ -226,7 +219,6 @@ onMounted(() => {
   margin-bottom: var(--eos-space-m);
 }
 
-/* Auth Methods */
 .auth-header {
   text-align: center;
   margin-bottom: var(--eos-space-2xl);
@@ -296,7 +288,6 @@ onMounted(() => {
   text-align: left;
 }
 
-/* Buttons */
 .logout-button,
 .back-button {
   padding: var(--eos-space-m) var(--eos-space-l);
@@ -338,7 +329,6 @@ onMounted(() => {
   opacity: 0.9;
 }
 
-/* Telegram & Email Sections */
 .auth-methods-container {
   display: flex;
   flex-direction: column;

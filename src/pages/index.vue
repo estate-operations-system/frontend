@@ -4,7 +4,6 @@
       <h1 class="hero-title">Система управления объектом недвижимости</h1>
       <p class="hero-subtitle">Эффективное управление жилым комплексом и взаимодействие с жильцами</p>
       
-      <!-- Authorized User - Instructions -->
       <div v-if="isLoggedIn" class="instructions">
         <h2>Добро пожаловать!</h2>
         <div class="instruction-items">
@@ -28,7 +27,6 @@
         </div>
       </div>
 
-      <!-- Not Authorized - Login Prompt -->
       <div v-else class="login-prompt">
         <p class="prompt-text">Для доступа к системе необходимо авторизоваться</p>
         <button @click="goToLoginPage" class="auth-button">Авторизоваться</button>
@@ -80,7 +78,6 @@ const goToLoginPage = () => {
   line-height: var(--eos-line-height-normal);
 }
 
-/* Instructions for authorized users */
 .instructions {
   margin-top: var(--eos-space-xl);
 }
@@ -154,7 +151,6 @@ const goToLoginPage = () => {
   opacity: 0.9;
 }
 
-/* Login prompt for unauthorized users */
 .login-prompt {
   margin-top: var(--eos-space-2xl);
   padding: var(--eos-space-2xl);

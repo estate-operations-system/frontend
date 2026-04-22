@@ -1,7 +1,6 @@
 <template>
   <div class="auth-container">
     <div class="auth-card">
-      <!-- Telegram Auth with Widget -->
       <div v-if="authMethod === 'telegram'" class="auth-section">
         <div class="telegram-widget-container">
           <div 
@@ -13,7 +12,6 @@
         <p v-if="status" :class="statusClass">{{ status }}</p>
       </div>
 
-      <!-- Email Auth -->
       <div v-else-if="authMethod === 'email'" class="auth-section">
         <h1>Вход через Email</h1>
 
@@ -90,7 +88,6 @@
         <p v-if="status" :class="statusClass">{{ status }}</p>
       </div>
 
-      <!-- Method selector -->
       <div v-else class="method-selector">
         <h1>Выберите способ входа</h1>
         <div class="method-buttons">
@@ -133,7 +130,6 @@ const formData = ref({
   code: '',
 });
 
-// Глобальная функция для Telegram виджета
 (window as any).onTelegramAuth = async (user: any) => {
   console.log('Telegram auth callback received:', user);
   status.value = 'Отправка данных на сервер...';
@@ -186,17 +182,14 @@ const selectMethod = (method: 'telegram' | 'email') => {
 };
 
 const loadTelegramWidget = () => {
-  // Находим контейнер
   const container = document.getElementById('telegram-login-widget');
   if (!container) {
     console.error('Container not found');
     return;
   }
   
-  // Очищаем контейнер
   container.innerHTML = '';
   
-  // Создаем скрипт для Telegram виджета
   const script = document.createElement('script');
   script.src = 'https://telegram.org/js/telegram-widget.js?22';
   script.async = true;
@@ -220,7 +213,6 @@ const loadTelegramWidget = () => {
   container.appendChild(script);
 };
 
-// Обработка прямого перехода с параметрами от бота
 const handleDirectAuth = async () => {
   const authData = {
     id: Number(route.query.id),
@@ -251,8 +243,6 @@ const handleSendCode = async () => {
   statusClass.value = '';
 
   try {
-    // Имитация отправки - замените на реальный API
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
     status.value = 'Код отправлен на ваш email';
     statusClass.value = 'success';
@@ -277,8 +267,7 @@ const handleVerifyCode = async () => {
   statusClass.value = '';
 
   try {
-    // Имитация проверки - замените на реальный API
-    await new Promise(resolve => setTimeout(resolve, 1000));
+
     
     status.value = 'Авторизация успешна!';
     statusClass.value = 'success';
@@ -297,7 +286,6 @@ const handleVerifyCode = async () => {
 onMounted(() => {
   console.log('Auth page mounted');
   
-  // Проверяем параметры в URL
   if (route.query.id && route.query.hash) {
     authMethod.value = 'telegram';
     handleDirectAuth();

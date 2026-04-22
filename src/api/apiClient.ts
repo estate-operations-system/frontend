@@ -76,7 +76,6 @@ export class ApiClient {
   }
 
   private async refreshTokens(): Promise<{ token: string; refreshToken: string } | null> {
-    // Если уже идет refresh, ждем его результата
     if (this.isRefreshing && this.refreshPromise) {
       return this.refreshPromise
     }
@@ -145,12 +144,10 @@ export class ApiClient {
     try {
       const response = await fetch(url, finalOptions)
 
-      // Обработка 401: попытка обновить токен и повторить запрос
       if (response.status === 401) {
         const refreshed = await this.refreshTokens()
 
         if (refreshed) {
-          // Повторить запрос с новыми токенами
           const retryOptions: RequestInit = {
             headers: {
               [this.contentType === 'application/json' ? 'Content-Type' : 'content-type']: this.contentType,
@@ -170,7 +167,6 @@ export class ApiClient {
 
           return retryResponse.json() as Promise<T>
         } else {
-          // Refresh не удался, перенаправить на логин
           window.location.href = '/'
           throw new Error('Session expired. Please login again.')
         }
