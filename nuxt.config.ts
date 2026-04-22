@@ -22,7 +22,8 @@ export default defineNuxtConfig({
   vite: {
     server: {
       allowedHosts: [
-        process.env.NUXT_PUBLIC_NGROK_URL || ''
+        process.env.NUXT_PUBLIC_NGROK_URL || '',
+        `woolstapling-johnson-synergistically.ngrok-free.dev`
       ]
     }
   }

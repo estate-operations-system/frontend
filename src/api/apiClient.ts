@@ -261,18 +261,6 @@ export class ApiClient {
     )
   }
 
-  async createTicket(
-    payload: components['schemas']['TicketCreate']
-  ) {
-    return this._request<paths['/api/tickets']['post']['responses'][201]['content']['application/json']>(
-      `${this.baseUrl}/api/tickets`,
-      {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      }
-    )
-  }
-
   async updateTicket(
     id: number,
     payload: components['schemas']['TicketUpdate']
@@ -335,6 +323,29 @@ export class ApiClient {
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify(telegramData),
+    })
+  }
+
+  async sendVerificationCode(email: string, telegramId: string, name: string) {
+    return this._request(`${this.baseUrl}/api/auth/send-verification-code`, {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+        telegram_id: telegramId,
+        name,
+      }),
+    })
+  }
+
+  async verifyCode(email: string, code: string, telegramId: string, name: string) {
+    return this._request(`${this.baseUrl}/api/auth/verify-code`, {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+        code,
+        telegram_id: telegramId,
+        name,
+      }),
     })
   }
 

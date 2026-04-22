@@ -12,15 +12,13 @@
       Пользователь не найден
     </Alert>
 
-    <Card v-else>
-      <template #header>
-        <div class="card-header-content">
-          <div>
-            <h1 class="user-name">{{ user.name }}</h1>
-            <span class="user-id">ID: {{ user.id }}</span>
-          </div>
+    <div v-else class="user-content">
+      <div class="user-header">
+        <div>
+          <h1 class="user-name">{{ user.name }}</h1>
+          <span class="user-id">ID: {{ user.id }}</span>
         </div>
-      </template>
+      </div>
 
       <div class="info-section">
         <h2 class="section-title">Информация о профиле</h2>
@@ -43,12 +41,12 @@
         </div>
       </div>
 
-      <template #footer>
+      <div class="user-actions">
         <NuxtLink to="/users">
-          <Button variant="secondary">Вернуться к списку</Button>
+          <EosButton variant="secondary">Вернуться к списку</EosButton>
         </NuxtLink>
-      </template>
-    </Card>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,6 +54,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
+import { EosButton } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
 type User = components["schemas"]["User"]
@@ -90,19 +89,31 @@ onMounted(async () => {
 
 <style lang="css" scoped>
 .user-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
+  padding: var(--eos-space-l);
 }
 
-.card-header-content {
+.user-content {
+  background: white;
+  border: 1px solid var(--eos-color-border);
+  border-radius: var(--eos-radius-m);
+  padding: var(--eos-space-2xl);
+}
+
+.user-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  margin-bottom: var(--eos-space-2xl);
+  padding-bottom: var(--eos-space-l);
+  border-bottom: 2px solid var(--eos-color-border);
 }
 
 .user-name {
-  font-size: var(--eos-font-size-xl);
+  font-size: var(--eos-font-size-2xl);
   font-weight: var(--eos-font-weight-bold);
+  color: var(--eos-color-primary);
   margin: 0 0 var(--eos-space-s) 0;
 }
 
@@ -119,7 +130,7 @@ onMounted(async () => {
   font-size: var(--eos-font-size-l);
   font-weight: var(--eos-font-weight-semibold);
   color: var(--eos-color-primary);
-  margin-bottom: var(--eos-space-l);
+  margin: 0 0 var(--eos-space-l) 0;
   padding-bottom: var(--eos-space-m);
   border-bottom: 2px solid var(--eos-color-border);
 }
@@ -128,6 +139,7 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--eos-space-l);
+  margin-bottom: var(--eos-space-2xl);
 }
 
 .info-item {
@@ -151,13 +163,26 @@ onMounted(async () => {
   margin: 0;
 }
 
+.user-actions {
+  display: flex;
+  gap: var(--eos-space-m);
+  border-top: 1px solid var(--eos-color-border);
+  padding-top: var(--eos-space-l);
+}
+
+
+
 @media (max-width: 768px) {
   .user-container {
-    padding: 0;
+    padding: var(--eos-space-m);
+  }
+
+  .user-content {
+    padding: var(--eos-space-l);
   }
 
   .user-name {
-    font-size: var(--eos-font-size-l);
+    font-size: var(--eos-font-size-xl);
   }
 
   .info-grid {
