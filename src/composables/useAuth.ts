@@ -25,6 +25,7 @@ interface AuthResponse {
 
 const TOKEN_KEY = 'token'
 const REFRESH_TOKEN_KEY = 'refreshToken'
+const USER_ROLE_KEY = 'userRole'
 
 export const useAuth = () => {
   const router = useRouter()
@@ -32,6 +33,7 @@ export const useAuth = () => {
 
   const isLoading = ref(false)
   const errorMessage = ref<string | null>(null)
+  const user = ref<{ id?: number; name?: string; role?: string } | null>(null)
 
   const isLoggedIn = computed(() => {
     try {
@@ -57,6 +59,22 @@ export const useAuth = () => {
     }
   }
 
+  const getUserRole = (): string | null => {
+    try {
+      return localStorage.getItem(USER_ROLE_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  const setUserRole = (role: string): void => {
+    try {
+      localStorage.setItem(USER_ROLE_KEY, role)
+    } catch (error) {
+      console.error('Failed to set user role:', error)
+    }
+  }
+
   const setToken = (token: string, refreshToken: string): void => {
     try {
       localStorage.setItem(TOKEN_KEY, token)
@@ -79,6 +97,12 @@ export const useAuth = () => {
     isLoading.value = true
     try {
       removeToken()
+      user.value = null
+      try {
+        localStorage.removeItem(USER_ROLE_KEY)
+      } catch (error) {
+        console.error('Failed to remove user role:', error)
+      }
       await router.push('/')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Logout failed'
@@ -86,6 +110,26 @@ export const useAuth = () => {
       throw error
     } finally {
       isLoading.value = false
+    }
+  }
+
+  const loadCurrentUser = async (): Promise<void> => {
+    try {
+      const token = getToken()
+      console.log('loadCurrentUser: token exists:', !!token)
+      if (!token) return
+
+      const response = await apiClient.getUserById('me' as any) as any
+      console.log('loadCurrentUser response:', response)
+      if (response?.data) {
+        user.value = response.data
+        console.log('Current user loaded:', response.data, 'role:', response.data.role)
+        if (response.data.role) {
+          setUserRole(response.data.role)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load current user:', error)
     }
   }
 
@@ -100,11 +144,18 @@ export const useAuth = () => {
 
       if (response?.token && response?.refreshToken) {
         setToken(response.token, response.refreshToken)
+        const userData = response.data || {}
+        user.value = userData
+        if (userData.role) {
+          setUserRole(userData.role)
+        }
+        // Load full user data with role
+        await loadCurrentUser()
         return {
           success: true,
           token: response.token,
           refreshToken: response.refreshToken,
-          user: response.data,
+          user: userData,
         }
       } else {
         throw new Error('Token not received from server')
@@ -162,11 +213,16 @@ export const useAuth = () => {
 
       if (response?.success && response?.token && response?.refreshToken) {
         setToken(response.token, response.refreshToken)
+        const userData = response.data || {}
+        user.value = userData
+        if (userData.role) {
+          setUserRole(userData.role)
+        }
         return {
           success: true,
           token: response.token,
           refreshToken: response.refreshToken,
-          user: response.data,
+          user: userData,
         }
       } else {
         throw new Error(response?.error || 'Verification failed')
@@ -186,11 +242,14 @@ export const useAuth = () => {
   }
 
   return {
+    user,
     isLoggedIn,
     isLoading,
     errorMessage,
     getToken,
     getRefreshToken,
+    getUserRole,
+    setUserRole,
     setToken,
     removeToken,
     logout,
@@ -198,5 +257,6 @@ export const useAuth = () => {
     sendVerificationCode,
     verifyCode,
     clearError,
+    loadCurrentUser,
   }
 }

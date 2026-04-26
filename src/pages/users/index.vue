@@ -29,6 +29,7 @@
             <th>ID</th>
             <th>Имя</th>
             <th>Telegram</th>
+            <th>Роль</th>
             <th>Действие</th>
           </tr>
         </thead>
@@ -37,6 +38,11 @@
             <td class="cell-id">{{ user.id }}</td>
             <td class="cell-name">{{ user.name }}</td>
             <td class="cell-telegram">@{{ user.telegram_username || '-' }}</td>
+            <td class="cell-role">
+              <span :class="'role-badge role-' + (user.role || 'resident')">
+                {{ user.role || 'resident' }}
+              </span>
+            </td>
             <td class="cell-action">
               <NuxtLink :to="`/users/${user.id}`">
                 <Button size="sm">Просмотр</Button>
@@ -154,6 +160,34 @@ onMounted(async () => {
 .cell-telegram {
   color: var(--eos-color-text-secondary);
   font-family: monospace;
+}
+
+.cell-role {
+  text-align: center;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: var(--eos-font-size-s);
+  font-weight: var(--eos-font-weight-medium);
+  text-transform: capitalize;
+}
+
+.role-admin {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.role-manager {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.role-resident {
+  background-color: #dbeafe;
+  color: #2563eb;
 }
 
 .cell-action a {

@@ -10,7 +10,691 @@
       "url": "https://backend-pl4x.onrender.com/"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "botToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-bot-token"
+      }
+    },
+    "schemas": {
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Новая",
+              "Назначена",
+              "Выполняется",
+              "На проверке",
+              "Закрыта",
+              "Отменена"
+            ]
+          },
+          "resident_id": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "address",
+          "status",
+          "resident_id"
+        ]
+      },
+      "TicketCreate": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Новая",
+              "Назначена",
+              "Выполняется",
+              "На проверке",
+              "Закрыта",
+              "Отменена"
+            ]
+          },
+          "resident_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category",
+          "address",
+          "status",
+          "resident_id"
+        ]
+      },
+      "TicketUpdate": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Новая",
+              "Назначена",
+              "Выполняется",
+              "На проверке",
+              "Закрыта",
+              "Отменена"
+            ]
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "telegram_id": {
+            "type": "string"
+          },
+          "telegram_username": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "telegram_id": {
+            "type": "string"
+          },
+          "telegram_username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "telegram_id"
+        ]
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "VehicleParking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "license_plate": {
+            "type": "string"
+          },
+          "vehicle_make": {
+            "type": "string"
+          },
+          "vehicle_model": {
+            "type": "string"
+          },
+          "vehicle_color": {
+            "type": "string"
+          },
+          "parking_spot": {
+            "type": "string"
+          },
+          "parking_zone": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "license_plate",
+          "parking_spot"
+        ]
+      },
+      "VehicleParkingCreate": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer"
+          },
+          "license_plate": {
+            "type": "string"
+          },
+          "vehicle_make": {
+            "type": "string"
+          },
+          "vehicle_model": {
+            "type": "string"
+          },
+          "vehicle_color": {
+            "type": "string"
+          },
+          "parking_spot": {
+            "type": "string"
+          },
+          "parking_zone": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "license_plate",
+          "parking_spot"
+        ]
+      },
+      "VehicleParkingUpdate": {
+        "type": "object",
+        "properties": {
+          "license_plate": {
+            "type": "string"
+          },
+          "vehicle_make": {
+            "type": "string"
+          },
+          "vehicle_model": {
+            "type": "string"
+          },
+          "vehicle_color": {
+            "type": "string"
+          },
+          "parking_spot": {
+            "type": "string"
+          },
+          "parking_zone": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "botToken": []
+    }
+  ],
   "paths": {
+    "/api/auth/telegram": {
+      "get": {
+        "summary": "Проверка Telegram авторизации через query-параметры",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Telegram ID пользователя"
+          },
+          {
+            "in": "query",
+            "name": "first_name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "last_name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "username",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "auth_date",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "hash",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешная Telegram авторизация"
+          },
+          "403": {
+            "description": "Неверный Telegram auth hash"
+          }
+        }
+      },
+      "post": {
+        "summary": "Проверка Telegram авторизации через POST тело запроса",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "first_name": {
+                    "type": "string"
+                  },
+                  "last_name": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "photo_url": {
+                    "type": "string"
+                  },
+                  "auth_date": {
+                    "type": "string"
+                  },
+                  "hash": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "auth_date",
+                  "hash"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешная Telegram авторизация и получение JWT токена"
+          },
+          "403": {
+            "description": "Неверный Telegram auth hash"
+          }
+        }
+      }
+    },
+    "/api/auth/status": {
+      "get": {
+        "summary": "Проверить статус авторизации по JWT",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус авторизации"
+          },
+          "401": {
+            "description": "Access token required"
+          },
+          "403": {
+            "description": "Invalid token"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Выйти из системы",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный выход"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Зарегистрировать нового пользователя",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "telegram_id": {
+                    "type": "string"
+                  },
+                  "telegram_username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "telegram_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Пользователь зарегистрирован"
+          },
+          "409": {
+            "description": "Пользователь уже существует"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Войти с помощью telegram_id и пароля",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "telegram_id": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "telegram_id",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Вход выполнен успешно"
+          },
+          "400": {
+            "description": "telegram_id и password обязательны"
+          },
+          "401": {
+            "description": "Неверный пароль"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "summary": "Обновить access token используя refresh token",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string",
+                    "description": "Refresh token полученный при логине"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Новая пара токенов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "refreshToken": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Refresh token обязателен"
+          },
+          "401": {
+            "description": "Невалидный или истекший refresh token"
+          }
+        }
+      }
+    },
+    "/api/auth/send-verification-code": {
+      "post": {
+        "summary": "Отправить код подтверждения на email",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email адрес пользователя"
+                  },
+                  "telegram_id": {
+                    "type": "string",
+                    "description": "Telegram ID пользователя"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Имя пользователя"
+                  }
+                },
+                "required": [
+                  "email",
+                  "telegram_id",
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Код отправлен на email"
+          },
+          "400": {
+            "description": "Обязательные поля отсутствуют"
+          },
+          "409": {
+            "description": "Пользователь с таким email уже существует"
+          }
+        }
+      }
+    },
+    "/api/auth/verify-code": {
+      "post": {
+        "summary": "Проверить код подтверждения и выполнить регистрацию/авторизацию",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email адрес пользователя"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "6-значный код подтверждения"
+                  },
+                  "telegram_id": {
+                    "type": "string",
+                    "description": "Telegram ID пользователя"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Имя пользователя"
+                  }
+                },
+                "required": [
+                  "email",
+                  "code",
+                  "telegram_id",
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Регистрация/авторизация выполнена успешно"
+          },
+          "400": {
+            "description": "Неверный или истекший код"
+          }
+        }
+      }
+    },
     "/api/tickets": {
       "post": {
         "summary": "Создать новую заявку",
@@ -29,26 +713,10 @@
         },
         "responses": {
           "201": {
-            "description": "Заявка успешно создана",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Ticket"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Заявка создана"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequest"
+            "description": "Неверные данные"
           },
           "500": {
             "description": "Ошибка сервера"
@@ -62,30 +730,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Список заявок",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "count": {
-                      "type": "integer",
-                      "example": 10
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Ticket"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Список заявок"
           },
           "500": {
             "description": "Ошибка сервера"
@@ -106,35 +751,15 @@
             "required": true,
             "schema": {
               "type": "integer"
-            },
-            "description": "ID заявки"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Заявка найдена",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Ticket"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Неверный ID"
+            "description": "Заявка найдена"
           },
           "404": {
-            "$ref": "#/components/responses/NotFound"
+            "description": "Заявка не найдена"
           },
           "500": {
             "description": "Ошибка сервера"
@@ -153,8 +778,7 @@
             "required": true,
             "schema": {
               "type": "integer"
-            },
-            "description": "ID заявки"
+            }
           }
         ],
         "requestBody": {
@@ -169,33 +793,10 @@
         },
         "responses": {
           "200": {
-            "description": "Заявка успешно обновлена",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Ticket"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Заявка успешно обновлена"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Неверные данные"
+            "description": "Заявка обновлена"
           },
           "404": {
-            "$ref": "#/components/responses/NotFound"
+            "description": "Заявка не найдена"
           },
           "500": {
             "description": "Ошибка сервера"
@@ -214,36 +815,67 @@
             "required": true,
             "schema": {
               "type": "integer"
-            },
-            "description": "ID заявки"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Заявка успешно удалена",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Заявка успешно удалена"
-                    }
+            "description": "Заявка удалена"
+          },
+          "404": {
+            "description": "Заявка не найдена"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/api/tickets/{id}/status": {
+      "patch": {
+        "summary": "Обновить статус заявки (только для администраторов)",
+        "tags": [
+          "Tickets"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "Новая",
+                      "В работе",
+                      "Выполнена"
+                    ]
                   }
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Статус заявки обновлен"
           },
-          "400": {
-            "description": "Неверный ID"
+          "403": {
+            "description": "Доступ запрещен"
           },
           "404": {
-            "$ref": "#/components/responses/NotFound"
+            "description": "Заявка не найдена"
           },
           "500": {
             "description": "Ошибка сервера"
@@ -269,53 +901,13 @@
         },
         "responses": {
           "200": {
-            "description": "Пользователь успешно создан",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Пользователь создан"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
+            "description": "Пользователь создан"
           },
           "409": {
-            "$ref": "#/components/responses/UserExists"
+            "description": "Пользователь уже существует"
           },
           "500": {
-            "description": "Ошибка сервера",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string",
-                      "example": "Ошибка сервера при создании пользователя"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Ошибка сервера"
           }
         }
       },
@@ -326,50 +918,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Список пользователей",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "count": {
-                      "type": "integer",
-                      "example": 10
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/User"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Список пользователей"
           },
           "500": {
-            "description": "Ошибка сервера",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string",
-                      "example": "Ошибка сервера при получении пользователей"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Ошибка сервера"
           }
         }
       }
@@ -382,51 +934,23 @@
         ],
         "parameters": [
           {
-            "$ref": "#/components/parameters/userId"
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Пользователь найден",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Пользователь найден"
           },
           "404": {
-            "$ref": "#/components/responses/UserNotFound"
+            "description": "Пользователь не найден"
           },
           "500": {
-            "description": "Ошибка сервера",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string",
-                      "example": "Ошибка сервера при получении пользователя по id"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Ошибка сервера"
           }
         }
       },
@@ -437,7 +961,12 @@
         ],
         "parameters": [
           {
-            "$ref": "#/components/parameters/userId"
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "requestBody": {
@@ -452,50 +981,13 @@
         },
         "responses": {
           "200": {
-            "description": "Пользователь успешно обновлен",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Пользователь обновлен"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Пользователь обновлен"
           },
           "404": {
-            "$ref": "#/components/responses/UserNotFound"
+            "description": "Пользователь не найден"
           },
           "500": {
-            "description": "Ошибка сервера",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string",
-                      "example": "Ошибка сервера при обновлении пользователя"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Ошибка сервера"
           }
         }
       },
@@ -506,61 +998,23 @@
         ],
         "parameters": [
           {
-            "$ref": "#/components/parameters/userId"
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Пользователь успешно удален",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Пользователь удален"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "example": 1
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Пользователь удален"
           },
           "404": {
-            "$ref": "#/components/responses/UserNotFound"
+            "description": "Пользователь не найден"
           },
           "500": {
-            "description": "Ошибка сервера",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string",
-                      "example": "Ошибка сервера при удалении пользователя"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Ошибка сервера"
           }
         }
       }
@@ -573,317 +1027,239 @@
         ],
         "parameters": [
           {
-            "$ref": "#/components/parameters/telegramId"
+            "in": "path",
+            "name": "telegramId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Пользователь найден",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Пользователь найден"
           },
           "404": {
-            "description": "Пользователь не найден",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Пользователь не найден"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Пользователь не найден"
           },
           "500": {
-            "description": "Ошибка сервера",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Ошибка сервера при получении пользователя по telegram_id"
-                    }
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/role": {
+      "patch": {
+        "summary": "Обновить роль пользователя (только для администраторов)",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "жилец",
+                      "администратор",
+                      "юрист"
+                    ]
                   }
                 }
               }
             }
           }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Ticket": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Роль пользователя обновлена"
           },
-          "category": {
-            "type": "string",
-            "example": "Сантехника"
+          "403": {
+            "description": "Доступ запрещен"
           },
-          "description": {
-            "type": "string",
-            "example": "Протекает кран на кухне"
+          "404": {
+            "description": "Пользователь не найден"
           },
-          "address": {
-            "type": "string",
-            "example": "ул. Ленина, 10, кв. 25"
-          },
-          "status": {
-            "type": "string",
-            "example": "open"
-          },
-          "resident_id": {
-            "type": "integer",
-            "example": 123
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-01-15T10:30:00Z"
-          }
-        }
-      },
-      "TicketCreate": {
-        "type": "object",
-        "required": [
-          "category",
-          "description",
-          "resident_id"
-        ],
-        "properties": {
-          "category": {
-            "type": "string",
-            "example": "Сантехника"
-          },
-          "description": {
-            "type": "string",
-            "example": "Протекает кран на кухне"
-          },
-          "address": {
-            "type": "string",
-            "example": "ул. Ленина, 10, кв. 25"
-          },
-          "resident_id": {
-            "type": "integer",
-            "example": 123
-          }
-        }
-      },
-      "TicketUpdate": {
-        "type": "object",
-        "properties": {
-          "category": {
-            "type": "string",
-            "example": "Сантехника"
-          },
-          "description": {
-            "type": "string",
-            "example": "Протекает кран на кухне"
-          },
-          "address": {
-            "type": "string",
-            "example": "ул. Ленина, 10, кв. 25"
-          },
-          "status": {
-            "type": "string",
-            "example": "in_progress"
-          }
-        }
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Иван Иванов"
-          },
-          "password": {
-            "type": "string",
-            "example": "hashed_password_123"
-          },
-          "telegram_id": {
-            "type": "integer",
-            "example": 123456789
-          },
-          "telegram_username": {
-            "type": "string",
-            "example": "@ivanov"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-01-15T10:30:00Z"
-          }
-        }
-      },
-      "UserCreate": {
-        "type": "object",
-        "required": [
-          "name",
-          "telegram_id"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "Иван Иванов"
-          },
-          "telegram_id": {
-            "type": "integer",
-            "example": 123456789
-          },
-          "telegram_username": {
-            "type": "string",
-            "example": "@ivanov"
-          },
-          "password": {
-            "type": "string",
-            "example": "password123"
-          }
-        }
-      },
-      "UserUpdate": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "Иван Иванов (обновленный)"
-          },
-          "password": {
-            "type": "string",
-            "example": "new_password_123"
+          "500": {
+            "description": "Ошибка сервера"
           }
         }
       }
     },
-    "responses": {
-      "NotFound": {
-        "description": "Ресурс не найден",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": {
-                  "type": "boolean",
-                  "example": false
-                },
-                "error": {
-                  "type": "string",
-                  "example": "Заявка не найдена"
-                }
+    "/api/vehicle-parking": {
+      "post": {
+        "summary": "Создать запись транспортного средства / парковки",
+        "tags": [
+          "VehicleParking"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleParkingCreate"
               }
             }
           }
-        }
-      },
-      "BadRequest": {
-        "description": "Неверные параметры запроса",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": {
-                  "type": "boolean",
-                  "example": false
-                },
-                "error": {
-                  "type": "string",
-                  "example": "Имя и telegram_id обязательны"
-                }
-              }
-            }
+        },
+        "responses": {
+          "201": {
+            "description": "Запись создана"
+          },
+          "400": {
+            "description": "Неверные данные"
+          },
+          "500": {
+            "description": "Ошибка сервера"
           }
         }
       },
-      "UserNotFound": {
-        "description": "Пользователь не найден",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": {
-                  "type": "boolean",
-                  "example": false
-                },
-                "error": {
-                  "type": "string",
-                  "example": "Пользователь не найден"
-                }
-              }
-            }
-          }
-        }
-      },
-      "UserExists": {
-        "description": "Пользователь уже существует",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": {
-                  "type": "boolean",
-                  "example": false
-                },
-                "error": {
-                  "type": "string",
-                  "example": "Пользователь с таким telegram id уже существует"
-                }
-              }
-            }
+      "get": {
+        "summary": "Получить все записи по транспортным средствам и парковкам",
+        "tags": [
+          "VehicleParking"
+        ],
+        "responses": {
+          "200": {
+            "description": "Список записей"
+          },
+          "500": {
+            "description": "Ошибка сервера"
           }
         }
       }
     },
-    "parameters": {
-      "userId": {
-        "in": "path",
-        "name": "id",
-        "required": true,
-        "schema": {
-          "type": "integer"
-        },
-        "description": "ID пользователя"
+    "/api/vehicle-parking/{id}": {
+      "get": {
+        "summary": "Получить запись по ID",
+        "tags": [
+          "VehicleParking"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запись найдена"
+          },
+          "404": {
+            "description": "Запись не найдена"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
       },
-      "telegramId": {
-        "in": "path",
-        "name": "telegramId",
-        "required": true,
-        "schema": {
-          "type": "integer"
+      "put": {
+        "summary": "Обновить запись транспортного средства/парковки",
+        "tags": [
+          "VehicleParking"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleParkingUpdate"
+              }
+            }
+          }
         },
-        "description": "Telegram ID пользователя"
+        "responses": {
+          "200": {
+            "description": "Запись обновлена"
+          },
+          "404": {
+            "description": "Запись не найдена"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Удалить запись транспортного средства/парковки",
+        "tags": [
+          "VehicleParking"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запись удалена"
+          },
+          "404": {
+            "description": "Запись не найдена"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/api/vehicle-parking/user/{userId}": {
+      "get": {
+        "summary": "Получить записи по user_id",
+        "tags": [
+          "VehicleParking"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список записей пользователя"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
       }
     }
   },
@@ -895,6 +1271,10 @@
     {
       "name": "Users",
       "description": "Управление пользователями (жителями ТСЖ)"
+    },
+    {
+      "name": "VehicleParking",
+      "description": "Управление транспортными средствами жителей и парковочными местами (единая таблица)"
     }
   ]
 }

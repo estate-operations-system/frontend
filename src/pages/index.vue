@@ -53,8 +53,11 @@ const goToLoginPage = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
-  padding: var(--eos-space-l) var(--eos-space-m);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
 }
 
 .hero {

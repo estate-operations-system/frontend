@@ -111,10 +111,12 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+const { sendVerificationCode, verifyCode, authenticateWithTelegram } = useAuth();
 
 const router = useRouter();
 const route = useRoute();
 const config = useRuntimeConfig();
+
 
 const authMethod = ref<'telegram' | 'email' | null>(null);
 const step = ref(1);
@@ -243,7 +245,12 @@ const handleSendCode = async () => {
   statusClass.value = '';
 
   try {
-    
+    const result = await sendVerificationCode(
+      formData.value.email,
+      formData.value.telegramId,
+      formData.value.name
+    );
+
     status.value = 'Код отправлен на ваш email';
     statusClass.value = 'success';
     step.value = 2;
@@ -254,6 +261,7 @@ const handleSendCode = async () => {
     isLoading.value = false;
   }
 };
+
 
 const handleVerifyCode = async () => {
   if (!formData.value.code) {
@@ -267,7 +275,12 @@ const handleVerifyCode = async () => {
   statusClass.value = '';
 
   try {
-
+    const result = await verifyCode(
+      formData.value.email,
+      formData.value.code,
+      formData.value.telegramId,
+      formData.value.name
+    );
     
     status.value = 'Авторизация успешна!';
     statusClass.value = 'success';
@@ -481,6 +494,7 @@ onMounted(() => {
   margin: 80px 0 50px 0;
   min-height: 80px;
 }
+
 
 .telegram-widget {
   display: flex;
