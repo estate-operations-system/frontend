@@ -5,7 +5,7 @@
         <NuxtLink to="/users" class="header__link">Пользователи</NuxtLink>
         <NuxtLink to="/tickets" class="header__link">Заявки</NuxtLink>
       </div>
-      <NuxtLink v-if="isLoggedIn" to="/profile" class="header__profile-button">
+      <NuxtLink to="/profile" class="header__profile-button">
         <EosAccountIcon/>
       </NuxtLink>
     </div>
