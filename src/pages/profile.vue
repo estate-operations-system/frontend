@@ -1,25 +1,24 @@
 <template>
-  <div class="profile-page">
-    <div class="profile-container">
-      <div v-if="isLoggedIn" class="profile-content">
-        <div class="profile-header">
-          <div class="profile-icon-large" />
-          <h1>Ваш профиль</h1>
-        </div>
-        
-        <div class="profile-info">
-          <p>Вы успешно авторизованы в системе</p>
-        </div>
-        
-        <div class="profile-actions">
-          <button @click="handleLogout" :disabled="isLoading" class="logout-button">
-            {{ isLoading ? 'Выход...' : 'Выйти' }}
-          </button>
-          <button @click="goHome" class="back-button">На главную</button>
-        </div>
-      </div>
+  <div class="profile">
+      <template v-if="isLoggedIn">
+        <h1 class="profile__title">Ваш профиль</h1>
+        <p class="profile__subtitle">Вы успешно авторизованы в системе</p>
 
-      <div v-else class="auth-content">
+        <!-- <div>
+          Информация о пользователе будет отображаться здесь в будущем. Сейчас это просто заглушка для демонстрации авторизации.
+        </div> -->
+        
+        <div class="profile__actions">
+          <EosButton @click="handleLogout" :loading="isLoading">
+            Выйти
+          </EosButton>
+          <EosButton :variant="ButtonVariant.Secondary" to="/" :loading="isLoading">
+            На главную
+          </EosButton>
+        </div>
+      </template>
+
+      <!-- <div v-else class="auth-content">
         <div class="auth-header">
           <h1>Вход в систему</h1>
           <p>Выберите способ авторизации</p>
@@ -44,8 +43,7 @@
         </div>
         
         <button @click="goHome" class="back-button">Вернуться на главную</button>
-      </div>
-    </div>
+      </div> -->
   </div>
 </template>
 
@@ -53,6 +51,7 @@
 import { useRouter } from "vue-router";
 import { ref, onMounted, nextTick } from "vue";
 import { useAuth } from "~/composables/useAuth";
+import { ButtonVariant, EosButton } from "eos-ui-kit";
 
 const router = useRouter();
 const config = useRuntimeConfig();
@@ -162,8 +161,40 @@ onMounted(() => {
 });
 </script>
 
-<style lang="css" scoped>
-.profile-page {
+<style lang="scss" scoped>
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--eos-space-l) var(--eos-space-m);
+  background-color: var(--eos-color-primary-50);
+  width: 100%;
+  height: 100%;
+  border-radius: var(--eos-radius-l);
+
+  &__title {
+    font-size: var(--eos-font-size-xl);
+    font-weight: var(--eos-font-weight-bold);
+    color: var(--eos-color-primary-700);
+    text-align: center;
+  }
+
+  &__subtitle {
+    font-size: var(--eos-font-size-m);
+    color: var(--eos-color-primary-800);
+    text-align: center;
+    margin-top: var(--eos-space-xs);
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--eos-space-m);
+    margin-top: var(--eos-space-2xl);
+  }
+}
+/* .profile-page {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -399,5 +430,5 @@ onMounted(() => {
   .profile-icon-large {
     font-size: 48px;
   }
-}
+} */
 </style>
