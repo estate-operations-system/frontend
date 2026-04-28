@@ -52,7 +52,7 @@ const { isLoggedIn } = useAuth();
 
   &__links {
     display: flex;
-    gap: var(--eos-space-l);
+    gap: var(--eos-space-xl);
     align-items: center;
     position: absolute;
     left: 50%;
@@ -60,7 +60,6 @@ const { isLoggedIn } = useAuth();
   }
 
   &__link {
-    text-transform: uppercase;
     font-size: var(--eos-font-size-l);
     font-weight: var(--eos-font-weight-semibold);
 
