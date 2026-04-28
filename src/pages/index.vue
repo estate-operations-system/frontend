@@ -4,7 +4,6 @@
       <p class="home__subtitle">Все что нужно для комфортной жизни в одном месте</p>
       
       <div v-if="isLoggedIn" class="home__instructions">
-        <div class="home__cards">
           <HomeCard
             :number="1"
             title="Управление пользователями"
@@ -20,27 +19,25 @@
             to="/tickets"
             buttonText="Перейти к заявкам"
           />
-        </div>
       </div>
 
-      <div v-else class="login-prompt">
-        <p class="prompt-text">Для доступа к системе необходимо авторизоваться</p>
-        <button @click="goToLoginPage" class="auth-button">Авторизоваться</button>
+      <div v-else class="home__auth">
+        <HomeCard
+          title="Вы не авторизованы :("
+          description="Войдите в свой профиль, чтобы просматривать и управлять заявками от жильцов"
+          to="/profile"
+          buttonText="Авторизоваться"
+          align="center"
+        />
       </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAuth } from "~/composables/useAuth";
-import { useRouter } from "vue-router";
 import HomeCard from "~/components/HomeCard.vue";
 
-const router = useRouter();
 const { isLoggedIn } = useAuth();
-
-const goToLoginPage = () => {
-  router.push('/profile');
-};
 </script>
 
 <style lang="scss" scoped>
@@ -67,9 +64,6 @@ const goToLoginPage = () => {
   &__instructions {
     width: 100%;
     max-width: 1200px;
-  }
-
-  &__cards {
     display: flex;
     flex-direction: row;
     gap: var(--eos-space-2xl);
