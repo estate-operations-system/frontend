@@ -109,6 +109,7 @@ import type { components } from '~/api/api'
 type Ticket = components["schemas"]["Ticket"]
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
+const { getUserRole } = useAuth()
 
 const tickets = ref<Ticket[]>([])
 const loading = ref(true)
@@ -116,6 +117,11 @@ const error = ref<string | null>(null)
 const isCreateModalOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | null>(null)
+
+const isAdmin = computed(() => {
+  const role = getUserRole()
+  return role === 'администратор'
+})
 const form = ref({
   category: '',
   description: '',

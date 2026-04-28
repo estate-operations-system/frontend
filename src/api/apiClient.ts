@@ -235,6 +235,20 @@ export class ApiClient {
     )
   }
 
+  async updateUserRole(id: number, payload: { role: string }) {
+    return this._request(`${this.baseUrl}/api/users/${id}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async updateTicketStatus(id: number, payload: { status: string }) {
+    return this._request(`${this.baseUrl}/api/tickets/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  }
+
   async deleteUser(id: number) {
     return this._request(`${this.baseUrl}/api/users/${id}`, {
       method: 'DELETE',

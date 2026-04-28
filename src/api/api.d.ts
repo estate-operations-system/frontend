@@ -4,6 +4,466 @@
  */
 
 export interface paths {
+    "/api/auth/telegram": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Проверка Telegram авторизации через query-параметры */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Telegram ID пользователя */
+                    id: string;
+                    first_name?: string;
+                    last_name?: string;
+                    username?: string;
+                    auth_date: string;
+                    hash: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Успешная Telegram авторизация */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Неверный Telegram auth hash */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** Проверка Telegram авторизации через POST тело запроса */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        id: string;
+                        first_name?: string;
+                        last_name?: string;
+                        username?: string;
+                        photo_url?: string;
+                        auth_date: string;
+                        hash: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Успешная Telegram авторизация и получение JWT токена */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Неверный Telegram auth hash */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Проверить статус авторизации по JWT */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Статус авторизации */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Access token required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Invalid token */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Выйти из системы */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Успешный выход */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Зарегистрировать нового пользователя */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        name: string;
+                        telegram_id: string;
+                        telegram_username?: string;
+                        password?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Пользователь зарегистрирован */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Пользователь уже существует */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Войти с помощью telegram_id и пароля */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        telegram_id: string;
+                        password: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Вход выполнен успешно */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description telegram_id и password обязательны */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Неверный пароль */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Пользователь не найден */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Обновить access token используя refresh token */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Refresh token полученный при логине */
+                        refreshToken: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Новая пара токенов */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success?: boolean;
+                            token?: string;
+                            refreshToken?: string;
+                        };
+                    };
+                };
+                /** @description Refresh token обязателен */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Невалидный или истекший refresh token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/send-verification-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Отправить код подтверждения на email */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: email
+                         * @description Email адрес пользователя
+                         */
+                        email: string;
+                        /** @description Telegram ID пользователя */
+                        telegram_id: string;
+                        /** @description Имя пользователя */
+                        name: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Код отправлен на email */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Обязательные поля отсутствуют */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Пользователь с таким email уже существует */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/verify-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Проверить код подтверждения и выполнить регистрацию/авторизацию */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: email
+                         * @description Email адрес пользователя
+                         */
+                        email: string;
+                        /** @description 6-значный код подтверждения */
+                        code: string;
+                        /** @description Telegram ID пользователя */
+                        telegram_id: string;
+                        /** @description Имя пользователя */
+                        name: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Регистрация/авторизация выполнена успешно */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Неверный или истекший код */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tickets": {
         parameters: {
             query?: never;
@@ -26,15 +486,7 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            /** @example 10 */
-                            count?: number;
-                            data?: components["schemas"]["Ticket"][];
-                        };
-                    };
+                    content?: never;
                 };
                 /** @description Ошибка сервера */
                 500: {
@@ -60,20 +512,20 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Заявка успешно создана */
+                /** @description Заявка создана */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            data?: components["schemas"]["Ticket"];
-                        };
-                    };
+                    content?: never;
                 };
-                400: components["responses"]["BadRequest"];
+                /** @description Неверные данные */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
@@ -102,7 +554,6 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID заявки */
                     id: number;
                 };
                 cookie?: never;
@@ -114,22 +565,15 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            data?: components["schemas"]["Ticket"];
-                        };
-                    };
+                    content?: never;
                 };
-                /** @description Неверный ID */
-                400: {
+                /** @description Заявка не найдена */
+                404: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                404: components["responses"]["NotFound"];
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
@@ -145,7 +589,6 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID заявки */
                     id: number;
                 };
                 cookie?: never;
@@ -156,29 +599,20 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Заявка успешно обновлена */
+                /** @description Заявка обновлена */
                 200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            data?: components["schemas"]["Ticket"];
-                            /** @example Заявка успешно обновлена */
-                            message?: string;
-                        };
-                    };
-                };
-                /** @description Неверные данные */
-                400: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                404: components["responses"]["NotFound"];
+                /** @description Заявка не найдена */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
@@ -195,35 +629,26 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID заявки */
                     id: number;
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Заявка успешно удалена */
+                /** @description Заявка удалена */
                 200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            /** @example Заявка успешно удалена */
-                            message?: string;
-                        };
-                    };
-                };
-                /** @description Неверный ID */
-                400: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                404: components["responses"]["NotFound"];
+                /** @description Заявка не найдена */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
@@ -236,6 +661,70 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/tickets/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Обновить статус заявки (только для администраторов) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status?: "Новая" | "В работе" | "Выполнена";
+                    };
+                };
+            };
+            responses: {
+                /** @description Статус заявки обновлен */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Доступ запрещен */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Заявка не найдена */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         trace?: never;
     };
     "/api/users": {
@@ -260,29 +749,14 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            /** @example 10 */
-                            count?: number;
-                            data?: components["schemas"]["User"][];
-                        };
-                    };
+                    content?: never;
                 };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example false */
-                            success?: boolean;
-                            /** @example Ошибка сервера при получении пользователей */
-                            error?: string;
-                        };
-                    };
+                    content?: never;
                 };
             };
         };
@@ -301,36 +775,26 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Пользователь успешно создан */
+                /** @description Пользователь создан */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            /** @example Пользователь создан */
-                            message?: string;
-                            data?: components["schemas"]["User"];
-                        };
-                    };
+                    content?: never;
                 };
-                400: components["responses"]["BadRequest"];
-                409: components["responses"]["UserExists"];
+                /** @description Пользователь уже существует */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example false */
-                            success?: boolean;
-                            /** @example Ошибка сервера при создании пользователя */
-                            error?: string;
-                        };
-                    };
+                    content?: never;
                 };
             };
         };
@@ -353,8 +817,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID пользователя */
-                    id: components["parameters"]["userId"];
+                    id: number;
                 };
                 cookie?: never;
             };
@@ -365,28 +828,21 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            data?: components["schemas"]["User"];
-                        };
-                    };
+                    content?: never;
                 };
-                404: components["responses"]["UserNotFound"];
+                /** @description Пользователь не найден */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example false */
-                            success?: boolean;
-                            /** @example Ошибка сервера при получении пользователя по id */
-                            error?: string;
-                        };
-                    };
+                    content?: never;
                 };
             };
         };
@@ -396,8 +852,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID пользователя */
-                    id: components["parameters"]["userId"];
+                    id: number;
                 };
                 cookie?: never;
             };
@@ -407,35 +862,26 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Пользователь успешно обновлен */
+                /** @description Пользователь обновлен */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            /** @example Пользователь обновлен */
-                            message?: string;
-                            data?: components["schemas"]["User"];
-                        };
-                    };
+                    content?: never;
                 };
-                404: components["responses"]["UserNotFound"];
+                /** @description Пользователь не найден */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example false */
-                            success?: boolean;
-                            /** @example Ошибка сервера при обновлении пользователя */
-                            error?: string;
-                        };
-                    };
+                    content?: never;
                 };
             };
         };
@@ -446,45 +892,32 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID пользователя */
-                    id: components["parameters"]["userId"];
+                    id: number;
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Пользователь успешно удален */
+                /** @description Пользователь удален */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            /** @example Пользователь удален */
-                            message?: string;
-                            data?: {
-                                /** @example 1 */
-                                id?: number;
-                            };
-                        };
-                    };
+                    content?: never;
                 };
-                404: components["responses"]["UserNotFound"];
+                /** @description Пользователь не найден */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example false */
-                            success?: boolean;
-                            /** @example Ошибка сервера при удалении пользователя */
-                            error?: string;
-                        };
-                    };
+                    content?: never;
                 };
             };
         };
@@ -506,8 +939,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description Telegram ID пользователя */
-                    telegramId: components["parameters"]["telegramId"];
+                    telegramId: string;
                 };
                 cookie?: never;
             };
@@ -518,37 +950,327 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example true */
-                            success?: boolean;
-                            data?: components["schemas"]["User"];
-                        };
-                    };
+                    content?: never;
                 };
                 /** @description Пользователь не найден */
                 404: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example Пользователь не найден */
-                            message?: string;
-                        };
-                    };
+                    content?: never;
                 };
                 /** @description Ошибка сервера */
                 500: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            /** @example Ошибка сервера при получении пользователя по telegram_id */
-                            message?: string;
-                        };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{id}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Обновить роль пользователя (только для администраторов) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        role?: "жилец" | "администратор" | "юрист";
                     };
+                };
+            };
+            responses: {
+                /** @description Роль пользователя обновлена */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Доступ запрещен */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Пользователь не найден */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/vehicle-parking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить все записи по транспортным средствам и парковкам */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Список записей */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /** Создать запись транспортного средства / парковки */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VehicleParkingCreate"];
+                };
+            };
+            responses: {
+                /** @description Запись создана */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Неверные данные */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/vehicle-parking/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить запись по ID */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Запись найдена */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Запись не найдена */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        /** Обновить запись транспортного средства/парковки */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VehicleParkingUpdate"];
+                };
+            };
+            responses: {
+                /** @description Запись обновлена */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Запись не найдена */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        /** Удалить запись транспортного средства/парковки */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Запись удалена */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Запись не найдена */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/vehicle-parking/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить записи по user_id */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Список записей пользователя */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
                 };
             };
         };
@@ -565,142 +1287,87 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         Ticket: {
-            /** @example 1 */
-            id?: number;
-            /** @example Сантехника */
-            category?: string;
-            /** @example Протекает кран на кухне */
+            id: number;
+            category: string;
             description?: string;
-            /** @example ул. Ленина, 10, кв. 25 */
-            address?: string;
-            /** @example open */
-            status?: string;
-            /** @example 123 */
-            resident_id?: number;
-            /**
-             * Format: date-time
-             * @example 2024-01-15T10:30:00Z
-             */
+            address: string;
+            /** @enum {string} */
+            status: "Новая" | "Назначена" | "Выполняется" | "На проверке" | "Закрыта" | "Отменена";
+            resident_id: number;
+            /** Format: date-time */
             created_at?: string;
         };
         TicketCreate: {
-            /** @example Сантехника */
             category: string;
-            /** @example Протекает кран на кухне */
-            description: string;
-            /** @example ул. Ленина, 10, кв. 25 */
-            address?: string;
-            /** @example 123 */
+            description?: string;
+            address: string;
+            /** @enum {string} */
+            status: "Новая" | "Назначена" | "Выполняется" | "На проверке" | "Закрыта" | "Отменена";
             resident_id: number;
         };
         TicketUpdate: {
-            /** @example Сантехника */
             category?: string;
-            /** @example Протекает кран на кухне */
             description?: string;
-            /** @example ул. Ленина, 10, кв. 25 */
             address?: string;
-            /** @example in_progress */
-            status?: string;
+            /** @enum {string} */
+            status?: "Новая" | "Назначена" | "Выполняется" | "На проверке" | "Закрыта" | "Отменена";
         };
         User: {
-            /** @example 1 */
             id?: number;
-            /** @example Иван Иванов */
             name?: string;
-            /** @example hashed_password_123 */
             password?: string;
-            /** @example 123456789 */
-            telegram_id?: number;
-            /** @example @ivanov */
+            telegram_id?: string;
             telegram_username?: string;
-            /**
-             * Format: date-time
-             * @example 2024-01-15T10:30:00Z
-             */
+            /** Format: date-time */
             created_at?: string;
         };
         UserCreate: {
-            /** @example Иван Иванов */
             name: string;
-            /** @example 123456789 */
-            telegram_id: number;
-            /** @example @ivanov */
+            telegram_id: string;
             telegram_username?: string;
-            /** @example password123 */
             password?: string;
         };
         UserUpdate: {
-            /** @example Иван Иванов (обновленный) */
             name?: string;
-            /** @example new_password_123 */
             password?: string;
         };
-    };
-    responses: {
-        /** @description Ресурс не найден */
-        NotFound: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @example false */
-                    success?: boolean;
-                    /** @example Заявка не найдена */
-                    error?: string;
-                };
-            };
+        VehicleParking: {
+            id: number;
+            user_id: number;
+            license_plate: string;
+            vehicle_make?: string;
+            vehicle_model?: string;
+            vehicle_color?: string;
+            parking_spot: string;
+            parking_zone?: string;
+            comment?: string;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
         };
-        /** @description Неверные параметры запроса */
-        BadRequest: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @example false */
-                    success?: boolean;
-                    /** @example Имя и telegram_id обязательны */
-                    error?: string;
-                };
-            };
+        VehicleParkingCreate: {
+            user_id: number;
+            license_plate: string;
+            vehicle_make?: string;
+            vehicle_model?: string;
+            vehicle_color?: string;
+            parking_spot: string;
+            parking_zone?: string;
+            comment?: string;
         };
-        /** @description Пользователь не найден */
-        UserNotFound: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @example false */
-                    success?: boolean;
-                    /** @example Пользователь не найден */
-                    error?: string;
-                };
-            };
-        };
-        /** @description Пользователь уже существует */
-        UserExists: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @example false */
-                    success?: boolean;
-                    /** @example Пользователь с таким telegram id уже существует */
-                    error?: string;
-                };
-            };
+        VehicleParkingUpdate: {
+            license_plate?: string;
+            vehicle_make?: string;
+            vehicle_model?: string;
+            vehicle_color?: string;
+            parking_spot?: string;
+            parking_zone?: string;
+            comment?: string;
         };
     };
-    parameters: {
-        /** @description ID пользователя */
-        userId: number;
-        /** @description Telegram ID пользователя */
-        telegramId: number;
-    };
+    responses: never;
+    parameters: never;
     requestBodies: never;
     headers: never;
     pathItems: never;

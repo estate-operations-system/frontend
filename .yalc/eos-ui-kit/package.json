@@ -1,6 +1,6 @@
 {
   "name": "eos-ui-kit",
-  "version": "0.4.0",
+  "version": "0.6.1",
   "description": "UI component library for the Estate Operations System",
   "private": false,
   "type": "module",
@@ -15,7 +15,11 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "generate-icons": "tsx src/scripts/generate-icons.ts"
+    "generate-icons": "tsx src/scripts/generate-icons.ts",
+    "lint": "eslint src --ext .ts,.tsx,.vue && stylelint src/**/*.{css,scss}",
+    "lint:fix": "eslint src --ext .ts,.tsx,.vue --fix && stylelint src/**/*.{css,scss} --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,vue,json,css,scss}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,vue,json,css,scss}\""
   },
   "peerDependencies": {
     "vue": "^3.3.0"
@@ -24,5 +28,18 @@
     "vite-svg-loader": "^5.1.1",
     "yalc": "^1.0.0-pre.53"
   },
-  "yalcSig": "558ef17a881bc1a6fba7a2d91cef8941"
+  "lint-staged": {
+    "src/**/*.{ts,tsx,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{css,scss}": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{json}": [
+      "prettier --write"
+    ]
+  },
+  "yalcSig": "f422d41f91ea6f1ebc0d5672869255df"
 }

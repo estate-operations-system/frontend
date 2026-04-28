@@ -45,6 +45,23 @@
               <label class="info-label">Дата создания</label>
               <p class="info-value">{{ formatDate(ticket.created_at) }}</p>
             </div>
+
+            <div class="info-item" v-if="isAdmin">
+              <label class="info-label">Статус</label>
+              <div class="status-selector">
+                <select v-model="selectedStatus" class="status-input">
+                  <option value="Новая">Новая</option>
+                  <option value="В работе">В работе</option>
+                  <option value="Выполнена">Выполнена</option>
+                </select>
+                <button 
+                  @click="updateTicketStatus"
+                  class="save-button"
+                >
+                  {{ updatingStatus ? 'Сохранение...' : 'Сохранить' }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -59,6 +76,14 @@
         </div>
       </div>
 
+      <Alert v-if="statusError" type="error" title="Ошибка обновления статуса" closeable @close="statusError = null">
+        {{ statusError }}
+      </Alert>
+
+      <Alert v-if="statusSuccess" type="success" title="Успешно" closeable @close="statusSuccess = false">
+        Статус заявки успешно обновлен
+      </Alert>
+
       <div class="ticket-actions">
         <NuxtLink to="/tickets">
           <EosButton variant="secondary">Вернуться к списку</EosButton>
@@ -69,9 +94,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
+import { useAuth } from '~/composables/useAuth'
 import { EosButton } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
@@ -79,9 +105,19 @@ type Ticket = components["schemas"]["Ticket"]
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const route = useRoute()
+const { getUserRole } = useAuth()
 
 const ticket = ref<Ticket | null>(null)
 const loading = ref(true)
+const selectedStatus = ref('open')
+const updatingStatus = ref(false)
+const statusError = ref<string | null>(null)
+const statusSuccess = ref(false)
+
+const isAdmin = computed(() => {
+  const role = getUserRole()
+  return role === 'администратор'
+})
 
 const formatDate = (date: string | undefined) => {
   if (!date) return '-'
@@ -104,13 +140,29 @@ const getBadgeVariant = (status: string | undefined): 'primary' | 'secondary' | 
   return statusMap[status?.toLowerCase() as string] || 'primary'
 }
 
+const updateTicketStatus = async () => {
+  console.log(status)
+  try {
+    await api.updateTicketStatus(ticket.value.id, { status })
+    const ticket = tickets.value.find(t => t.id === id)
+    if (ticket) {
+      ticket.status = status
+    }
+  } catch (e: any) {
+    error.value = e.message || 'Ошибка обновления статуса'
+  }
+}
+
 onMounted(async () => {
   try {
     const id = Number(route.params.id)
     const res = await api.getTicketById(id)
     ticket.value = res.data ?? null
+    if (ticket.value) {
+      selectedStatus.value = ticket.value.status || 'Новая'
+    }
   } catch (e: any) {
-    error.value = e.message || 'Ошибка загрузки'
+    statusError.value = e.message || 'Ошибка загрузки'
   } finally {
     loading.value = false
   }
@@ -196,6 +248,50 @@ onMounted(async () => {
   color: var(--eos-color-text);
   word-break: break-all;
   margin: 0;
+}
+
+.status-selector {
+  display: flex;
+  gap: var(--eos-space-s);
+  align-items: center;
+}
+
+.status-input {
+  flex: 1;
+  padding: var(--eos-space-s) var(--eos-space-m);
+  border: 1px solid var(--eos-color-border);
+  border-radius: 4px;
+  font-size: var(--eos-font-size-m);
+  background-color: white;
+  color: var(--eos-color-text);
+  cursor: pointer;
+}
+
+.status-input:focus {
+  outline: none;
+  border-color: var(--eos-color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.save-button {
+  padding: var(--eos-space-s) var(--eos-space-m);
+  background-color: var(--eos-color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: var(--eos-font-size-m);
+  font-weight: var(--eos-font-weight-semibold);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-button:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.save-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
 }
 
 .info-link {
