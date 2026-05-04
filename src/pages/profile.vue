@@ -129,7 +129,8 @@ const loadTelegramWidget = () => {
 };
 
 const loginWithEmail = () => {
-  router.push('/auth?method=email');
+  sessionStorage.setItem('authEmailMode', 'login');
+  router.push('/auth');
 };
 
 const handleLogout = async () => {

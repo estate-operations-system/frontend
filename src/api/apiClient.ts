@@ -336,25 +336,42 @@ export class ApiClient {
     })
   }
 
-  async sendVerificationCode(email: string, telegramId: string, name: string) {
-    return this._request(`${this.baseUrl}/api/auth/send-verification-code`, {
+  async sendRegistrationCode(email: string, name: string) {
+    return this._request(`${this.baseUrl}/api/auth/send-registration-code`, {
       method: 'POST',
       body: JSON.stringify({
         email,
-        telegram_id: telegramId,
         name,
       }),
     })
   }
 
-  async verifyCode(email: string, code: string, telegramId: string, name: string) {
-    return this._request(`${this.baseUrl}/api/auth/verify-code`, {
+  async verifyRegistrationCode(email: string, code: string, name: string) {
+    return this._request(`${this.baseUrl}/api/auth/verify-registration-code`, {
       method: 'POST',
       body: JSON.stringify({
         email,
         code,
-        telegram_id: telegramId,
         name,
+      }),
+    })
+  }
+
+  async sendLoginCode(email: string) {
+    return this._request(`${this.baseUrl}/api/auth/send-login-code`, {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+      }),
+    })
+  }
+
+  async verifyLoginCode(email: string, code: string) {
+    return this._request(`${this.baseUrl}/api/auth/verify-login-code`, {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+        code,
       }),
     })
   }
