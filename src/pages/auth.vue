@@ -1,134 +1,93 @@
 <template>
-  <div class="auth-container">
-    <div class="auth-card">
-      <div v-if="authMethod === 'telegram'" class="auth-section">
-        <div class="telegram-widget-container">
-          <div 
-            id="telegram-login-widget"
-            class="telegram-widget"
-          ></div>
-        </div>
-        
-        <p v-if="status" :class="statusClass">{{ status }}</p>
-      </div>
+  <div class="auth">
+    <h1 class="auth__title">{{ emailMode === 'register' ? 'Регистрация' : 'Вход' }}</h1>
+    <p class="auth__subtitle">{{ emailMode === 'register' 
+        ? 'Создайте новый аккаунт' 
+        : 'Войдите в свой аккаунт' }}
+    </p>
 
-      <div v-else-if="authMethod === 'email'" class="auth-section">
-        <h1>Вход через Email</h1>
+    <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
+      <template v-if="step === 1">
+        <EosInput
+          v-if="emailMode === 'register'"
+          v-model="formData.name"
+          :type="InputType.Text"
+          placeholder="Введите ваше имя"
+          :disabled="isLoading"
+        />
 
-        <div v-if="step === 1" class="form-section">
-          <form @submit.prevent="handleSendCode" class="auth-form">
-            <div class="form-group">
-              <label>Имя:</label>
-              <input
-                v-model="formData.name"
-                type="text"
-                required
-                placeholder="Введите ваше имя"
-                :disabled="isLoading"
-                class="custom-input"
-              />
-            </div>
+        <EosInput
+          v-model="formData.email"
+          :type="InputType.Email"
+          placeholder="your@email.com"
+          :disabled="isLoading"
+        />
 
-            <div class="form-group">
-              <label>Email:</label>
-              <input
-                v-model="formData.email"
-                type="email"
-                required
-                placeholder="your@email.com"
-                :disabled="isLoading"
-                class="custom-input"
-              />
-            </div>
+        <EosButton 
+          type="submit"
+          :loading="isLoading"
+        >
+          {{'Отправить код'}}
+        </EosButton>
+      </template>
 
-            <div class="form-group">
-              <label>Telegram ID:</label>
-              <input
-                v-model="formData.telegramId"
-                type="text"
-                required
-                placeholder="Ваш Telegram ID"
-                :disabled="isLoading"
-                class="custom-input"
-              />
-              <small>Узнать свой Telegram ID можно в боте @userinfobot</small>
-            </div>
+      <template v-else-if="step === 2">
+        <EosInput
+          v-model="formData.code"
+          :type="InputType.Text"
+          placeholder="Код из письма"
+          :disabled="isLoading"
+        />
 
-            <button type="submit" :disabled="isLoading" class="auth-button">
-              {{ isLoading ? 'Отправка...' : 'Отправить код' }}
-            </button>
-          </form>
-        </div>
+        <EosButton 
+          type="submit"
+          :loading="isLoading"
+        >
+          {{ 'Подтвердить' }}
+        </EosButton>
+      </template>
+    </form>
 
-        <div v-else-if="step === 2" class="form-section">
-          <form @submit.prevent="handleVerifyCode" class="auth-form">
-            <div class="form-group">
-              <label>Код подтверждения:</label>
-              <input
-                v-model="formData.code"
-                type="text"
-                required
-                placeholder="123456"
-                :disabled="isLoading"
-                class="custom-input"
-              />
-              <small>Код отправлен на {{ formData.email }}</small>
-            </div>
-
-            <button type="submit" :disabled="isLoading" class="auth-button">
-              {{ isLoading ? 'Проверка...' : 'Подтвердить' }}
-            </button>
-
-            <button type="button" @click="step = 1" :disabled="isLoading" class="back-button">
-              Назад
-            </button>
-          </form>
-        </div>
-
-        <p v-if="status" :class="statusClass">{{ status }}</p>
-      </div>
-
-      <div v-else class="method-selector">
-        <h1>Выберите способ входа</h1>
-        <div class="method-buttons">
-          <button @click="selectMethod('telegram')" class="method-button telegram">
-            <div class="method-icon" />
-            <div class="method-title">Telegram</div>
-            <div class="method-desc">Быстрый вход через Telegram</div>
-          </button>
-
-          <button @click="selectMethod('email')" class="method-button email">
-            <div class="method-icon" />
-            <div class="method-title">Email</div>
-            <div class="method-desc">Вход через email и код</div>
-          </button>
-        </div>
-      </div>
-    </div>
+    <p class="auth__footer">
+      {{ emailMode === 'register' 
+        ? 'Уже есть аккаунт?' 
+        : 'Нет аккаунта?' }}
+      <EosButton :variant="ButtonVariant.Tertiary" @click="switchEmailMode">
+        {{
+          emailMode === 'register'
+          ? 'Войти'
+          : 'Зарегистрироваться'
+        }}
+      </EosButton>
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-const { sendVerificationCode, verifyCode, authenticateWithTelegram } = useAuth();
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAuth } from '~/composables/useAuth';
+import { EosButton, EosInput, ButtonVariant, InputType } from 'eos-ui-kit';
 
-const router = useRouter();
+const { 
+  sendRegistrationCode, 
+  verifyRegistrationCode,
+  sendLoginCode,
+  verifyLoginCode,
+} = useAuth();
+
 const route = useRoute();
-const config = useRuntimeConfig();
-
 
 const authMethod = ref<'telegram' | 'email' | null>(null);
+const emailMode = ref<'login' | 'register'>('login');
 const step = ref(1);
 const status = ref('');
 const statusClass = ref('');
 const isLoading = ref(false);
-const botUsername = ref(config.public.telegramBotUsername || 'your_bot_username');
 
 const formData = ref({
   name: '',
   email: '',
-  telegramId: '',
   code: '',
 });
 
@@ -174,45 +133,11 @@ const formData = ref({
   }
 };
 
-const selectMethod = (method: 'telegram' | 'email') => {
-  authMethod.value = method;
-  if (method === 'telegram') {
-    nextTick(() => {
-      loadTelegramWidget();
-    });
-  }
-};
-
-const loadTelegramWidget = () => {
-  const container = document.getElementById('telegram-login-widget');
-  if (!container) {
-    console.error('Container not found');
-    return;
-  }
-  
-  container.innerHTML = '';
-  
-  const script = document.createElement('script');
-  script.src = 'https://telegram.org/js/telegram-widget.js?22';
-  script.async = true;
-  script.setAttribute('data-telegram-login', botUsername.value);
-  script.setAttribute('data-size', 'large');
-  script.setAttribute('data-radius', '8');
-  script.setAttribute('data-request-access', 'write');
-  script.setAttribute('data-onauth', 'onTelegramAuth(user)');
-  script.setAttribute('data-userpic', 'true');
-  
-  script.onload = () => {
-    console.log('Telegram widget script loaded and rendered');
-  };
-  
-  script.onerror = (error) => {
-    console.error('Failed to load Telegram widget:', error);
-    status.value = 'Ошибка загрузки Telegram виджета. Проверьте настройки бота.';
-    statusClass.value = 'error';
-  };
-  
-  container.appendChild(script);
+const switchEmailMode = () => {
+  emailMode.value = emailMode.value === 'login' ? 'register' : 'login';
+  step.value = 1;
+  formData.value = { name: '', email: '', code: '' };
+  status.value = '';
 };
 
 const handleDirectAuth = async () => {
@@ -234,22 +159,28 @@ const handleDirectAuth = async () => {
 };
 
 const handleSendCode = async () => {
-  if (!formData.value.name || !formData.value.email || !formData.value.telegramId) {
-    status.value = 'Заполните все поля';
-    statusClass.value = 'error';
-    return;
-  }
-
   isLoading.value = true;
   status.value = '';
   statusClass.value = '';
 
   try {
-    const result = await sendVerificationCode(
-      formData.value.email,
-      formData.value.telegramId,
-      formData.value.name
-    );
+    if (emailMode.value === 'register') {
+      if (!formData.value.name || !formData.value.email) {
+        status.value = 'Заполните имя и email';
+        statusClass.value = 'error';
+        isLoading.value = false;
+        return;
+      }
+      await sendRegistrationCode(formData.value.email, formData.value.name);
+    } else {
+      if (!formData.value.email) {
+        status.value = 'Введите email';
+        statusClass.value = 'error';
+        isLoading.value = false;
+        return;
+      }
+      await sendLoginCode(formData.value.email);
+    }
 
     status.value = 'Код отправлен на ваш email';
     statusClass.value = 'success';
@@ -275,19 +206,20 @@ const handleVerifyCode = async () => {
   statusClass.value = '';
 
   try {
-    const result = await verifyCode(
-      formData.value.email,
-      formData.value.code,
-      formData.value.telegramId,
-      formData.value.name
-    );
+    if (emailMode.value === 'register') {
+      await verifyRegistrationCode(
+        formData.value.email,
+        formData.value.code,
+        formData.value.name
+      );
+    } else {
+      await verifyLoginCode(formData.value.email, formData.value.code);
+    }
     
     status.value = 'Авторизация успешна!';
     statusClass.value = 'success';
 
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 2000);
+    window.location.href = '/';
   } catch (error: any) {
     status.value = error.message || 'Ошибка верификации';
     statusClass.value = 'error';
@@ -302,243 +234,268 @@ onMounted(() => {
   if (route.query.id && route.query.hash) {
     authMethod.value = 'telegram';
     handleDirectAuth();
-  } else if (route.query.method === 'telegram') {
-    authMethod.value = 'telegram';
-    nextTick(() => {
-      loadTelegramWidget();
-    });
-  } else if (route.query.method === 'email') {
-    authMethod.value = 'email';
+  } else {
+    // Проверяем sessionStorage на сохраненный режим email авторизации
+    const savedEmailMode = sessionStorage.getItem('authEmailMode') as 'login' | 'register' | null;
+    if (savedEmailMode) {
+      authMethod.value = 'email';
+      emailMode.value = savedEmailMode;
+      sessionStorage.removeItem('authEmailMode');
+    }
   }
 });
+
 </script>
 
-<style scoped>
-.auth-container {
+<style scoped lang="scss">
+.auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--eos-space-l) var(--eos-space-m);
+  background-color: var(--eos-color-primary-50);
+  width: 100%;
+  height: 100%;
+  border-radius: var(--eos-radius-l);
+
+  &__title {
+    font-size: var(--eos-font-size-xl);
+    font-weight: var(--eos-font-weight-bold);
+    color: var(--eos-color-primary-700);
+    text-align: center;
+  }
+
+  &__subtitle {
+    font-size: var(--eos-font-size-m);
+    color: var(--eos-color-primary-800);
+    text-align: center;
+    margin-top: var(--eos-space-xs);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--eos-space-m);
+    margin-top: var(--eos-space-xl);
+  }
+
+  &__footer {
+    text-align: center;
+    padding-top: var(--eos-space-m);
+  }
+}
+/* .auth {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 100px);
-  background: #ffffff;
-  padding: 16px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+  padding: 24px;
 }
 
-.auth-card {
+.auth__section {
   background: white;
   border-radius: 16px;
-  padding: 40px 32px;
-  text-align: center;
-  max-width: 400px;
+  padding: 48px 40px;
+  max-width: 420px;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-.auth-card h1 {
-  margin: 0 0 30px 0;
-  color: #2563eb;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.auth-section h1 {
-  display: none;
-}
-
-.method-selector {
-  padding: 20px 0;
-}
-
-.method-selector h1 {
-  margin: 0 0 40px 0;
+.auth__title {
+  margin: 0 0 8px 0;
   color: #1f2937;
   font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
-.method-buttons {
+.auth__subtitle {
+  margin: 0 0 32px 0;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.auth__content {
+  margin-bottom: 32px;
+}
+
+.auth__form {
   display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 40px;
+  flex-direction: column;
 }
 
-.method-button {
+.auth__form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth__label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.auth__hint {
+  display: block;
+  margin-top: 6px;
+  color: #9ca3af;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.auth__button {
+  margin-top: 8px;
+}
+
+.auth__status {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+
+  &_success {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  &_error {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &_loading {
+    background: #e0e7ff;
+    color: #3730a3;
+  }
+}
+
+.auth__methods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.auth__method-card {
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 12px;
-  padding: 35px 25px;
+  padding: 24px 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 200px;
   text-align: center;
-  flex: 1;
+  appearance: none;
+
+  &:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.method-button:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
-  transform: translateY(-3px);
-}
-
-.method-button.telegram:hover {
-  border-color: #0088cc;
-  box-shadow: 0 10px 25px rgba(0, 136, 204, 0.15);
-}
-
-.method-icon {
+.auth__method-icon {
   font-size: 40px;
   margin-bottom: 12px;
 }
 
-.method-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 8px;
+.auth__method-title {
+  font-size: 16px;
+  font-weight: 600;
   color: #1f2937;
+  margin-bottom: 4px;
 }
 
-.method-desc {
-  font-size: 13px;
+.auth__method-desc {
+  font-size: 12px;
   color: #6b7280;
   line-height: 1.4;
 }
 
-.auth-form {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.form-group {
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #374151;
-}
-
-.custom-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-}
-
-.custom-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-}
-
-.custom-input:disabled {
-  background: #f3f4f6;
-  cursor: not-allowed;
-}
-
-.form-group small {
-  display: block;
-  margin-top: 5px;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.auth-button {
-  width: 100%;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 14px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.auth-button:hover:not(:disabled) {
-  background: #2563eb;
-}
-
-.auth-button:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-.back-button {
-  width: 100%;
-  background: transparent;
-  color: #6b7280;
-  border: 2px solid #e5e7eb;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 12px;
-}
-
-.back-button:hover:not(:disabled) {
-  background: #f9fafb;
-  border-color: #d1d5db;
-}
-
-.telegram-widget-container {
+.auth__telegram-widget {
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin: 80px 0 50px 0;
-  min-height: 80px;
+  padding: 40px 0;
+  min-height: 100px;
 }
 
-
-.telegram-widget {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.telegram-widget iframe {
+.auth__telegram-widget :deep(iframe) {
   max-width: 100%;
 }
 
-p {
-  margin-top: 20px;
-  margin-bottom: 0;
-  font-size: 15px;
-  line-height: 1.5;
+.auth__divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 24px 0;
 }
 
-.loading {
-  color: #64748b;
+.auth__footer {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
 }
 
-.success {
-  color: #16a34a;
-  font-weight: 500;
+.auth__footer-text {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-.error {
-  color: #dc2626;
-  font-weight: 500;
+.auth__switch-link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: inline;
+  margin-left: 4px;
+
+  &:hover {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: #1d4ed8;
+  }
 }
 
 @media (max-width: 480px) {
-  .method-buttons {
-    flex-direction: column;
-    align-items: center;
+  .auth {
+    padding: 16px;
   }
 
-  .method-button {
-    min-width: 280px;
+  .auth__section {
+    padding: 32px 20px;
   }
 
-  .auth-card {
-    padding: 30px 20px;
+  .auth__title {
+    font-size: 24px;
   }
-}
+
+  .auth__methods {
+    grid-template-columns: 1fr;
+  }
+} */
 </style>

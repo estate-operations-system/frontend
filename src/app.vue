@@ -28,6 +28,9 @@ onMounted(async () => {
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+html {
+  background-color: var(--eos-color-primary-100);
+}
 
 .app {
   display: flex;
@@ -35,7 +38,6 @@ onMounted(async () => {
   min-height: 100vh;
   padding-top: var(--eos-space-m);
   font-family: 'Nunito', sans-serif;
-  background-color: var(--eos-color-primary-100);
 
   &__home {
     background: url('/background.png');
@@ -47,6 +49,7 @@ onMounted(async () => {
 
   &__content {
     padding-block: var(--eos-space-l);
+    width: 100%;
     max-width: 1600px;
     margin: 0 auto;
   }

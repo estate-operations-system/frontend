@@ -170,16 +170,15 @@ export const useAuth = () => {
     }
   }
 
-  const sendVerificationCode = async (
+   const sendRegistrationCode = async (
     email: string,
-    telegramId: string,
     name: string
   ): Promise<{ success: boolean; message: string }> => {
     isLoading.value = true
     errorMessage.value = null
 
     try {
-      const response = await apiClient.sendVerificationCode(email, telegramId, name) as any
+      const response = await apiClient.sendRegistrationCode(email, name) as any
 
       if (response?.success) {
         return {
@@ -187,29 +186,54 @@ export const useAuth = () => {
           message: response.message || 'Код отправлен на ваш email',
         }
       } else {
-        throw new Error(response?.error || 'Failed to send verification code')
+        throw new Error(response?.error || 'Failed to send registration code')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to send verification code'
+      const message = error instanceof Error ? error.message : 'Failed to send registration code'
       errorMessage.value = message
-      console.error('Send verification code failed:', error)
+      console.error('Send registration code failed:', error)
       throw error
     } finally {
       isLoading.value = false
     }
   }
 
-  const verifyCode = async (
+  const sendLoginCode = async (
+    email: string
+  ): Promise<{ success: boolean; message: string }> => {
+    isLoading.value = true
+    errorMessage.value = null
+
+    try {
+      const response = await apiClient.sendLoginCode(email) as any
+
+      if (response?.success) {
+        return {
+          success: true,
+          message: response.message || 'Код отправлен на ваш email',
+        }
+      } else {
+        throw new Error(response?.error || 'Failed to send login code')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to send login code'
+      errorMessage.value = message
+      console.error('Send login code failed:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+ const verifyRegistrationCode = async (
     email: string,
     code: string,
-    telegramId: string,
     name: string
   ): Promise<AuthResponse> => {
     isLoading.value = true
     errorMessage.value = null
 
     try {
-      const response = await apiClient.verifyCode(email, code, telegramId, name) as any
+      const response = await apiClient.verifyRegistrationCode(email, code, name) as any
 
       if (response?.success && response?.token && response?.refreshToken) {
         setToken(response.token, response.refreshToken)
@@ -225,12 +249,48 @@ export const useAuth = () => {
           user: userData,
         }
       } else {
-        throw new Error(response?.error || 'Verification failed')
+        throw new Error(response?.error || 'Registration verification failed')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Verification failed'
+      const message = error instanceof Error ? error.message : 'Registration verification failed'
       errorMessage.value = message
-      console.error('Code verification failed:', error)
+      console.error('Registration verification failed:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const verifyLoginCode = async (
+    email: string,
+    code: string
+  ): Promise<AuthResponse> => {
+    isLoading.value = true
+    errorMessage.value = null
+
+    try {
+      const response = await apiClient.verifyLoginCode(email, code) as any
+
+      if (response?.success && response?.token && response?.refreshToken) {
+        setToken(response.token, response.refreshToken)
+        const userData = response.data || {}
+        user.value = userData
+        if (userData.role) {
+          setUserRole(userData.role)
+        }
+        return {
+          success: true,
+          token: response.token,
+          refreshToken: response.refreshToken,
+          user: userData,
+        }
+      } else {
+        throw new Error(response?.error || 'Login verification failed')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Login verification failed'
+      errorMessage.value = message
+      console.error('Login verification failed:', error)
       throw error
     } finally {
       isLoading.value = false
@@ -254,9 +314,11 @@ export const useAuth = () => {
     removeToken,
     logout,
     authenticateWithTelegram,
-    sendVerificationCode,
-    verifyCode,
     clearError,
     loadCurrentUser,
+    sendRegistrationCode,
+    sendLoginCode,
+    verifyRegistrationCode,
+    verifyLoginCode
   }
 }
