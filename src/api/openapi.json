@@ -135,19 +135,52 @@
             "type": "string"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "telegram_id": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "telegram_username": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "жилец",
+              "администратор",
+              "юрист"
+            ],
+            "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
           },
           "created_at": {
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ]
       },
       "UserCreate": {
         "type": "object",
@@ -163,6 +196,26 @@
           },
           "password": {
             "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "жилец",
+              "администратор",
+              "юрист"
+            ]
+          },
+          "color": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
           }
         },
         "required": [
@@ -177,6 +230,26 @@
             "type": "string"
           },
           "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "жилец",
+              "администратор",
+              "юрист"
+            ]
+          },
+          "color": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
             "type": "string"
           }
         }

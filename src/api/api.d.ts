@@ -1476,11 +1476,17 @@ export interface components {
             status?: "Новая" | "Назначена" | "Выполняется" | "На проверке" | "Закрыта" | "Отменена";
         };
         User: {
-            id?: number;
-            name?: string;
-            password?: string;
-            telegram_id?: string;
-            telegram_username?: string;
+            id: number;
+            name: string;
+            password?: string | null;
+            telegram_id?: string | null;
+            telegram_username?: string | null;
+            email?: string | null;
+            /** @enum {string|null} */
+            role: "жилец" | "администратор" | "юрист" | null;
+            color?: string | null;
+            phoneNumber?: string | null;
+            address?: string | null;
             /** Format: date-time */
             created_at?: string;
         };
@@ -1489,10 +1495,22 @@ export interface components {
             telegram_id: string;
             telegram_username?: string;
             password?: string;
+            email?: string;
+            /** @enum {string} */
+            role?: "жилец" | "администратор" | "юрист";
+            color?: string;
+            phoneNumber?: string;
+            address?: string;
         };
         UserUpdate: {
             name?: string;
             password?: string;
+            email?: string;
+            /** @enum {string} */
+            role?: "жилец" | "администратор" | "юрист";
+            color?: string;
+            phoneNumber?: string;
+            address?: string;
         };
         VehicleParking: {
             id: number;

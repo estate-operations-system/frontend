@@ -1,93 +1,50 @@
 <template>
-  <div class="user-container">
-    <Breadcrumb :items="[
-      { label: 'Главная', to: '/' },
-      { label: 'Пользователи', to: '/users' },
-      { label: `#${$route.params.id}` }
-    ]" />
-
-    <Spinner v-if="loading" label="Загрузка профиля пользователя..." />
-
-    <Alert v-else-if="!user" type="error" title="Ошибка">
-      Пользователь не найден
-    </Alert>
-
-    <div v-else class="user-content">
-      <!-- Debug info -->
-      <div style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-size: 12px; border-radius: 4px;">
-        <div>Current user role: {{ authUser?.value?.role }}</div>
-        <div>Is Admin: {{ isAdmin }}</div>
-      </div>
-
-      <div class="user-header">
-        <div>
-          <h1 class="user-name">{{ user.name }}</h1>
-          <span class="user-id">ID: {{ user.id }}</span>
-        </div>
-      </div>
-
-      <div class="info-section">
-        <h2 class="section-title">Информация о профиле</h2>
-        
-        <div class="info-grid">
-          <div class="info-item">
-            <label class="info-label">Telegram ID</label>
-            <p class="info-value">{{ user.telegram_id || '-' }}</p>
+  <div v-if="user" class="user">
+    <div class="user__header" :style="{ backgroundColor: headerBgColor }">
+        <div class="user__avatar">
+          <div v-if="user.avatar">
+            <!-- TODO: добавить поддержку загрузки аватаров -->
           </div>
-
-          <div class="info-item">
-            <label class="info-label">Telegram Username</label>
-            <p class="info-value">@{{ user.telegram_username || '-' }}</p>
-          </div>
-
-          <div class="info-item">
-            <label class="info-label">Дата создания</label>
-            <p class="info-value">{{ formatDate(user.created_at) }}</p>
-          </div>
-
-          <div class="info-item" v-if="isAdmin">
-            <label class="info-label">Роль</label>
-            <div class="role-selector">
-              <select v-model="selectedRole" class="role-input">
-                <option value="жилец">Жилец</option>
-                <option value="юрист">Юрист</option>
-                <option value="админ">Администратор</option>
-              </select>
-              <button 
-                @click="updateRole"
-                :disabled="selectedRole === (user.role || 'жилец') || updatingRole"
-                class="save-button"
-              >
-                {{ updatingRole ? 'Сохранение...' : 'Сохранить' }}
-              </button>
-            </div>
-          </div>
-
-          <div class="info-item" v-else>
-            <label class="info-label">Роль</label>
-            <p class="info-value">
-              <span :class="'role-badge role-' + (user.role || 'resident')">
-                {{ user.role || 'resident' }}
-              </span>
-            </p>
+          <div v-else class="user__avatar-placeholder" :style="{ backgroundColor: user.color || '#ad6952' }">
+            {{ user.name.charAt(0).toUpperCase() }}
           </div>
         </div>
-      </div>
-
-      <Alert v-if="roleError" type="error" title="Ошибка обновления роли" closeable @close="roleError = null">
-        {{ roleError }}
-      </Alert>
-
-      <Alert v-if="roleSuccess" type="success" title="Успешно" closeable @close="roleSuccess = false">
-        Роль пользователя успешно обновлена
-      </Alert>
-
-      <div class="user-actions">
-        <NuxtLink to="/users">
-          <EosButton variant="secondary">Вернуться к списку</EosButton>
-        </NuxtLink>
-      </div>
+        <div class="user__header-info">
+          <h1>{{ user.name }}</h1>
+          <!-- TODO: добавить тег для роли пользователя -->
+          <span>
+            {{ user.role || 'Жилец' }}
+          </span>
+        </div>
     </div>
+
+    <section class="user__info">
+      <h2 class="user__info-title">Информация о пользователе:</h2>
+      <div v-if="user.telegram_username" style="display: inline-block;">
+        Телеграм: 
+        <EosButton :variant="ButtonVariant.Tertiary" @click="openTelegram">
+          @{{ user.telegram_username }}
+        </EosButton>
+      </div>
+      <div v-if="user.email">Почта: {{ user.email }}</div>
+      <div v-if="user.phoneNumber">Телефон: {{ user.phoneNumber }}</div>
+      <div v-if="user.address">Адрес: {{ user.address }}</div>
+    </section>
+
+    <section v-if="isAdmin" class="user__role-management">
+      <h2 class="user__role-management-title">Управление ролью</h2>
+      <p>Текущая роль: {{ user.role || 'Жилец' }}</p>
+      <select v-model="selectedRole">
+        <option value="жилец">жилец</option>
+        <option value="юрист">юрист</option>
+        <option value="администратор">администратор</option>
+      </select>
+      <EosButton 
+        @click="updateRole"
+      >
+        Сохранить
+      </EosButton>
+    </section>
   </div>
 </template>
 
@@ -96,7 +53,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import { useAuth } from '~/composables/useAuth'
-import { EosButton } from 'eos-ui-kit'
+import { EosButton, ButtonVariant } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
 type User = components["schemas"]["User"]
@@ -110,43 +67,47 @@ const user = ref<User | null>(null)
 const loading = ref(true)
 const selectedRole = ref('resident')
 const updatingRole = ref(false)
-const roleError = ref<string | null>(null)
-const roleSuccess = ref(false)
 
 const isAdmin = computed(() => {
   const role = getUserRole()
   return role === 'администратор'
 })
-const formatDate = (date: string | undefined) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('ru-RU', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+
+const headerBgColor = computed(() => {
+  const color = user.value?.color || '#ad6952'
+  const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/)
+  if (!match) return color
+  
+  const hue = match[1]
+  const saturation = Math.max(parseInt(match[2]) - 30, 30)
+  const lightness = Math.min(parseInt(match[3]) + 37, 95)
+  
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`
+})
 
 const updateRole = async () => {
   if (!user.value) return
   
   updatingRole.value = true
-  roleError.value = null
-  roleSuccess.value = false
-  console.log(selectedRole.value)
+  const oldRole = user.value.role || 'жилец'
   try {
     const res = await api.updateUserRole(user.value.id!, { role: selectedRole.value })
     if (res.data) {
       user.value.role = selectedRole.value
-      roleSuccess.value = true
+      alert(`Роль пользователя "${user.value.name}" изменена\n\n${oldRole} → ${selectedRole.value}`)
     } else {
-      roleError.value = 'Ошибка при обновлении роли'
+      alert('Ошибка при обновлении роли')
     }
   } catch (e: any) {
-    roleError.value = e.message || 'Ошибка при обновлении роли'
+    alert(e.message || 'Ошибка при обновлении роли')
   } finally {
     updatingRole.value = false
+  }
+}
+
+const openTelegram = () => {
+  if (user.value?.telegram_username) {
+    window.open(`https://t.me/${user.value.telegram_username}`, '_blank')
   }
 }
 
@@ -166,174 +127,74 @@ onMounted(async () => {
 })
 </script>
 
-<style lang="css" scoped>
-.user-container {
-  max-width: 900px;
+<style lang="scss" scoped>
+.user {
+  max-width: 1000px;
   margin: 0 auto;
-  padding: var(--eos-space-l);
-}
-
-.user-content {
-  background: white;
-  border: 1px solid var(--eos-color-border);
-  border-radius: var(--eos-radius-m);
-  padding: var(--eos-space-2xl);
-}
-
-.user-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--eos-space-2xl);
-  padding-bottom: var(--eos-space-l);
-  border-bottom: 2px solid var(--eos-color-border);
-}
-
-.user-name {
-  font-size: var(--eos-font-size-2xl);
-  font-weight: var(--eos-font-weight-bold);
-  color: var(--eos-color-primary);
-  margin: 0 0 var(--eos-space-s) 0;
-}
-
-.user-id {
-  font-size: var(--eos-font-size-m);
-  color: var(--eos-color-text-secondary);
-}
-
-.info-section {
-  padding: var(--eos-space-l) 0;
-}
-
-.section-title {
-  font-size: var(--eos-font-size-l);
-  font-weight: var(--eos-font-weight-semibold);
-  color: var(--eos-color-primary);
-  margin: 0 0 var(--eos-space-l) 0;
-  padding-bottom: var(--eos-space-m);
-  border-bottom: 2px solid var(--eos-color-border);
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--eos-space-l);
-  margin-bottom: var(--eos-space-2xl);
-}
-
-.info-item {
+  padding: var(--eos-space-l) var(--eos-space-m);
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-s);
-}
+  gap: var(--eos-space-l);
 
-.info-label {
-  font-size: var(--eos-font-size-s);
-  font-weight: var(--eos-font-weight-semibold);
-  color: var(--eos-color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.info-value {
-  font-size: var(--eos-font-size-m);
-  color: var(--eos-color-text);
-  word-break: break-all;
-  margin: 0;
-}
-
-.role-selector {
-  display: flex;
-  gap: var(--eos-space-s);
-  align-items: center;
-}
-
-.role-input {
-  flex: 1;
-  padding: var(--eos-space-s) var(--eos-space-m);
-  border: 1px solid var(--eos-color-border);
-  border-radius: 4px;
-  font-size: var(--eos-font-size-m);
-  background-color: white;
-  color: var(--eos-color-text);
-  cursor: pointer;
-}
-
-.role-input:focus {
-  outline: none;
-  border-color: var(--eos-color-primary);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.save-button {
-  padding: var(--eos-space-s) var(--eos-space-m);
-  background-color: var(--eos-color-primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: var(--eos-font-size-m);
-  font-weight: var(--eos-font-weight-semibold);
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.save-button:hover:not(:disabled) {
-  background-color: #2563eb;
-}
-
-.save-button:disabled {
-  background-color: #d1d5db;
-  cursor: not-allowed;
-}
-
-.role-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: var(--eos-font-size-s);
-  font-weight: var(--eos-font-weight-medium);
-  text-transform: capitalize;
-}
-
-.role-admin {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
-
-.role-manager {
-  background-color: #fef3c7;
-  color: #d97706;
-}
-
-.role-resident {
-  background-color: #dbeafe;
-  color: #2563eb;
-}
-
-.user-actions {
-  display: flex;
-  gap: var(--eos-space-m);
-  border-top: 1px solid var(--eos-color-border);
-  padding-top: var(--eos-space-l);
-}
-
-
-
-@media (max-width: 768px) {
-  .user-container {
-    padding: var(--eos-space-m);
-  }
-
-  .user-content {
+  &__header {
+    display: flex;
+    align-items: center;
+    color: var(--eos-color-primary-800);
     padding: var(--eos-space-l);
+    border-radius: var(--eos-radius-l);
+    gap: var(--eos-space-l);
+
+    &-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--eos-space-xs);
+    }
   }
 
-  .user-name {
-    font-size: var(--eos-font-size-xl);
+  &__avatar {
+
+    &-placeholder {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--eos-radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--eos-font-size-xl);
+      font-weight: var(--eos-font-weight-bold);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      color: white;
+    }
   }
 
-  .info-grid {
-    grid-template-columns: 1fr;
+  &__info {
+    background: var(--eos-color-primary-50);
+    border-radius: var(--eos-radius-l);
+    overflow: hidden;
+    padding: var(--eos-space-l);
+
+    &-title {
+      margin-bottom: var(--eos-space-s);
+    }
+  }
+
+  &__role-management {
+    background: var(--eos-color-primary-50);
+    border-radius: var(--eos-radius-l);
+    overflow: hidden;
+    padding: var(--eos-space-l);
+    display: flex;
+    flex-direction: column;
+    gap: var(--eos-space-s);
+
+    &-title {
+      margin-bottom: var(--eos-space-s);
+    }
+
+    .button,
+    select {
+      width: fit-content;
+    }
   }
 }
 </style>
