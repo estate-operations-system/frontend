@@ -345,7 +345,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/send-verification-code": {
+    "/api/auth/send-registration-code": {
         parameters: {
             query?: never;
             header?: never;
@@ -354,7 +354,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Отправить код подтверждения на email */
+        /** Отправить код подтверждения для регистрации через email (без Telegram) */
         post: {
             parameters: {
                 query?: never;
@@ -370,8 +370,6 @@ export interface paths {
                          * @description Email адрес пользователя
                          */
                         email: string;
-                        /** @description Telegram ID пользователя */
-                        telegram_id: string;
                         /** @description Имя пользователя */
                         name: string;
                     };
@@ -407,7 +405,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/verify-code": {
+    "/api/auth/verify-registration-code": {
         parameters: {
             query?: never;
             header?: never;
@@ -416,7 +414,66 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Проверить код подтверждения и выполнить регистрацию/авторизацию */
+        /** Проверить код подтверждения и выполнить регистрацию через email */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: email */
+                        email: string;
+                        /** @description 6-значный код подтверждения */
+                        code: string;
+                        /** @description Имя пользователя */
+                        name: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Регистрация выполнена успешно */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Неверный или истекший код */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Пользователь уже существует */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/send-login-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Отправить код подтверждения для авторизации через email */
         post: {
             parameters: {
                 query?: never;
@@ -432,17 +489,61 @@ export interface paths {
                          * @description Email адрес пользователя
                          */
                         email: string;
-                        /** @description 6-значный код подтверждения */
-                        code: string;
-                        /** @description Telegram ID пользователя */
-                        telegram_id: string;
-                        /** @description Имя пользователя */
-                        name: string;
                     };
                 };
             };
             responses: {
-                /** @description Регистрация/авторизация выполнена успешно */
+                /** @description Код отправлен на email */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Пользователь с таким email не найден */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/verify-login-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Проверить код подтверждения и выполнить авторизацию через email */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: email */
+                        email: string;
+                        /** @description 6-значный код подтверждения */
+                        code: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Авторизация выполнена успешно */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -456,8 +557,70 @@ export interface paths {
                     };
                     content?: never;
                 };
+                /** @description Пользователь не найден */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/dev-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * [DEV ONLY] Получить тестовый JWT токен
+         * @description Только для разработки и тестирования. НЕ ИСПОЛЬЗУЙТЕ В PRODUCTION!
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description ID пользователя для токена */
+                    userId?: number;
+                    /** @description Роль пользователя */
+                    role?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Успешно получен тестовый токен */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success?: boolean;
+                            token?: string;
+                            refreshToken?: string;
+                        };
+                    };
+                };
+                /** @description Только доступно в development режиме */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
