@@ -135,19 +135,52 @@
             "type": "string"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "telegram_id": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "telegram_username": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "жилец",
+              "администратор",
+              "юрист"
+            ],
+            "nullable": true
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
           },
           "created_at": {
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ]
       },
       "UserCreate": {
         "type": "object",
@@ -163,6 +196,26 @@
           },
           "password": {
             "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "жилец",
+              "администратор",
+              "юрист"
+            ]
+          },
+          "color": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
           }
         },
         "required": [
@@ -177,6 +230,26 @@
             "type": "string"
           },
           "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "жилец",
+              "администратор",
+              "юрист"
+            ]
+          },
+          "color": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
             "type": "string"
           }
         }
@@ -595,9 +668,9 @@
         }
       }
     },
-    "/api/auth/send-verification-code": {
+    "/api/auth/send-registration-code": {
       "post": {
-        "summary": "Отправить код подтверждения на email",
+        "summary": "Отправить код подтверждения для регистрации через email (без Telegram)",
         "tags": [
           "Auth"
         ],
@@ -613,10 +686,6 @@
                     "format": "email",
                     "description": "Email адрес пользователя"
                   },
-                  "telegram_id": {
-                    "type": "string",
-                    "description": "Telegram ID пользователя"
-                  },
                   "name": {
                     "type": "string",
                     "description": "Имя пользователя"
@@ -624,7 +693,6 @@
                 },
                 "required": [
                   "email",
-                  "telegram_id",
                   "name"
                 ]
               }
@@ -644,9 +712,57 @@
         }
       }
     },
-    "/api/auth/verify-code": {
+    "/api/auth/verify-registration-code": {
       "post": {
-        "summary": "Проверить код подтверждения и выполнить регистрацию/авторизацию",
+        "summary": "Проверить код подтверждения и выполнить регистрацию через email",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "6-значный код подтверждения"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Имя пользователя"
+                  }
+                },
+                "required": [
+                  "email",
+                  "code",
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Регистрация выполнена успешно"
+          },
+          "400": {
+            "description": "Неверный или истекший код"
+          },
+          "409": {
+            "description": "Пользователь уже существует"
+          }
+        }
+      }
+    },
+    "/api/auth/send-login-code": {
+      "post": {
+        "summary": "Отправить код подтверждения для авторизации через email",
         "tags": [
           "Auth"
         ],
@@ -661,25 +777,10 @@
                     "type": "string",
                     "format": "email",
                     "description": "Email адрес пользователя"
-                  },
-                  "code": {
-                    "type": "string",
-                    "description": "6-значный код подтверждения"
-                  },
-                  "telegram_id": {
-                    "type": "string",
-                    "description": "Telegram ID пользователя"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "Имя пользователя"
                   }
                 },
                 "required": [
-                  "email",
-                  "code",
-                  "telegram_id",
-                  "name"
+                  "email"
                 ]
               }
             }
@@ -687,10 +788,108 @@
         },
         "responses": {
           "200": {
-            "description": "Регистрация/авторизация выполнена успешно"
+            "description": "Код отправлен на email"
+          },
+          "404": {
+            "description": "Пользователь с таким email не найден"
+          }
+        }
+      }
+    },
+    "/api/auth/verify-login-code": {
+      "post": {
+        "summary": "Проверить код подтверждения и выполнить авторизацию через email",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "6-значный код подтверждения"
+                  }
+                },
+                "required": [
+                  "email",
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Авторизация выполнена успешно"
           },
           "400": {
             "description": "Неверный или истекший код"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      }
+    },
+    "/api/auth/dev-token": {
+      "get": {
+        "summary": "[DEV ONLY] Получить тестовый JWT токен",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Только для разработки и тестирования. НЕ ИСПОЛЬЗУЙТЕ В PRODUCTION!",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "ID пользователя для токена"
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "schema": {
+              "type": "string",
+              "default": "admin"
+            },
+            "description": "Роль пользователя"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно получен тестовый токен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "refreshToken": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Только доступно в development режиме"
           }
         }
       }
