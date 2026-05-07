@@ -1,10 +1,10 @@
 <template>
   <div class="home-card" :class="{ 'home-card_center': align === 'center' }">
     <div class="home-card__header">
-      <div v-if="number" class="home-card__number">{{ number }}</div>
-      <h3 class="home-card__title">{{ title }}</h3>
+      <div v-if="number" class="home-card__number h2">{{ number }}</div>
+      <h3 class="home-card__title h2">{{ title }}</h3>
     </div>
-    <p class="home-card__description">{{ description }}</p>
+    <p class="home-card__description p1">{{ description }}</p>
     <EosButton :to="to">{{ buttonText }}</EosButton>
   </div>
 </template>
@@ -60,41 +60,16 @@ defineProps<Props>();
     background-color: var(--eos-color-primary-600);
     color: var(--eos-color-primary-50);
     border-radius: 50%;
-    font-size: var(--eos-font-size-l);
-    font-weight: var(--eos-font-weight-bold);
   }
 
   &__title {
-    color: var(--eos-color-primary-800);
-    font-size: var(--eos-font-size-xl);
+    color: var(--eos-color-primary-700);
   }
 
   &__description {
-    color: var(--eos-color-primary-900);
+    color: var(--eos-color-primary-800);
     margin: var(--eos-space-m) 0;
     line-height: var(--eos-line-height-normal);
-  }
-
-  &__button {
-    margin-top: var(--eos-space-m);
-    padding: var(--eos-space-s) var(--eos-space-m);
-    background-color: var(--eos-color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--eos-radius-m);
-    font-size: var(--eos-font-size-m);
-    font-weight: var(--eos-font-weight-semibold);
-    cursor: pointer;
-    transition: background-color var(--eos-transition-base);
-    width: 100%;
-
-    &:hover {
-      background-color: #1e40af;
-    }
-
-    &:active {
-      opacity: 0.9;
-    }
   }
 }
 </style>

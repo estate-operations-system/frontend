@@ -5,12 +5,12 @@
           <div v-if="user.avatar">
             <!-- TODO: добавить поддержку загрузки аватаров -->
           </div>
-          <div v-else class="user__avatar-placeholder" :style="{ backgroundColor: user.color || '#ad6952' }">
+          <div v-else class="user__avatar-placeholder h1" :style="{ backgroundColor: user.color || '#ad6952' }">
             {{ user.name.charAt(0).toUpperCase() }}
           </div>
         </div>
         <div class="user__header-info">
-          <h1>{{ user.name }}</h1>
+          <h1 class="h1">{{ user.name }}</h1>
           <!-- TODO: добавить тег для роли пользователя -->
           <span>
             {{ user.role || 'Жилец' }}
@@ -19,21 +19,21 @@
     </div>
 
     <section class="user__info">
-      <h2 class="user__info-title">Информация о пользователе:</h2>
-      <div v-if="user.telegram_username" style="display: inline-block;">
+      <h2 class="user__info-title h2">Информация о пользователе:</h2>
+      <div v-if="user.telegram_username" class="p1" style="display: inline-block;">
         Телеграм: 
         <EosButton :variant="ButtonVariant.Tertiary" @click="openTelegram">
           @{{ user.telegram_username }}
         </EosButton>
       </div>
-      <div v-if="user.email">Почта: {{ user.email }}</div>
-      <div v-if="user.phoneNumber">Телефон: {{ user.phoneNumber }}</div>
-      <div v-if="user.address">Адрес: {{ user.address }}</div>
+      <div v-if="user.email" class="p1">Почта: {{ user.email }}</div>
+      <div v-if="user.phoneNumber" class="p1">Телефон: {{ user.phoneNumber }}</div>
+      <div v-if="user.address" class="p1">Адрес: {{ user.address }}</div>
     </section>
 
     <section v-if="isAdmin" class="user__role-management">
-      <h2 class="user__role-management-title">Управление ролью</h2>
-      <p>Текущая роль: {{ user.role || 'Жилец' }}</p>
+      <h2 class="user__role-management-title h2">Управление ролью</h2>
+      <p class="p1">Текущая роль: {{ user.role || 'Жилец' }}</p>
       <select v-model="selectedRole">
         <option value="жилец">жилец</option>
         <option value="юрист">юрист</option>
@@ -160,8 +160,6 @@ onMounted(async () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: var(--eos-font-size-xl);
-      font-weight: var(--eos-font-weight-bold);
       border: 2px solid rgba(255, 255, 255, 0.5);
       color: white;
     }
@@ -174,7 +172,7 @@ onMounted(async () => {
     padding: var(--eos-space-l);
 
     &-title {
-      margin-bottom: var(--eos-space-s);
+      margin-bottom: var(--eos-space-xs);
     }
   }
 
@@ -188,7 +186,7 @@ onMounted(async () => {
     gap: var(--eos-space-s);
 
     &-title {
-      margin-bottom: var(--eos-space-s);
+      margin-bottom: var(--eos-space-xs);
     }
 
     .button,
