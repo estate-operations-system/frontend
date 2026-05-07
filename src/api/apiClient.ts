@@ -395,7 +395,8 @@ export class ApiClient {
     const res = await fetch(`${this.baseUrl}/api/tickets`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders()
       },
       body: JSON.stringify(requestPayload)
     })
