@@ -1,7 +1,7 @@
 <template>
   <div class="users">
-    <h1 class="users__title">Пользователи</h1>
-    <p class="users__subtitle">Управление жильцами и их профилями</p>
+    <h1 class="users__title h1">Пользователи</h1>
+    <h2 class="users__subtitle h2">Управление жильцами и их профилями</h2>
       
     <EosTable :columns="tableColumns" :rows="tableRows" clickable @rowClick="handleRowClick" />
   </div>
@@ -60,14 +60,11 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .users {
   &__title {
-    font-size: var(--eos-font-size-xl);
-    font-weight: var(--eos-font-weight-bold);
     color: var(--eos-color-primary-700);
     text-align: center;
   }
 
   &__subtitle {
-    font-size: var(--eos-font-size-m);
     color: var(--eos-color-primary-800);
     text-align: center;
     margin-top: var(--eos-space-xs);

@@ -1,10 +1,10 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title">{{ emailMode === 'register' ? 'Регистрация' : 'Вход' }}</h1>
-    <p class="auth__subtitle">{{ emailMode === 'register' 
+    <h1 class="auth__title h1">{{ emailMode === 'register' ? 'Регистрация' : 'Вход' }}</h1>
+    <h2 class="auth__subtitle h2">{{ emailMode === 'register' 
         ? 'Создайте новый аккаунт' 
         : 'Войдите в свой аккаунт' }}
-    </p>
+    </h2>
 
     <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
       <template v-if="step === 1">
@@ -260,14 +260,11 @@ onMounted(() => {
   border-radius: var(--eos-radius-l);
 
   &__title {
-    font-size: var(--eos-font-size-xl);
-    font-weight: var(--eos-font-weight-bold);
     color: var(--eos-color-primary-700);
     text-align: center;
   }
 
   &__subtitle {
-    font-size: var(--eos-font-size-m);
     color: var(--eos-color-primary-800);
     text-align: center;
     margin-top: var(--eos-space-xs);
@@ -285,217 +282,4 @@ onMounted(() => {
     padding-top: var(--eos-space-m);
   }
 }
-/* .auth {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 100px);
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  padding: 24px;
-}
-
-.auth__section {
-  background: white;
-  border-radius: 16px;
-  padding: 48px 40px;
-  max-width: 420px;
-  width: 100%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.auth__title {
-  margin: 0 0 8px 0;
-  color: #1f2937;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.auth__subtitle {
-  margin: 0 0 32px 0;
-  color: #6b7280;
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-.auth__content {
-  margin-bottom: 32px;
-}
-
-.auth__form {
-  display: flex;
-  flex-direction: column;
-}
-
-.auth__form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.auth__field {
-  display: flex;
-  flex-direction: column;
-}
-
-.auth__label {
-  display: block;
-  margin-bottom: 8px;
-  color: #374151;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.auth__hint {
-  display: block;
-  margin-top: 6px;
-  color: #9ca3af;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.auth__button {
-  margin-top: 8px;
-}
-
-.auth__status {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  text-align: center;
-
-  &_success {
-    background: #dcfce7;
-    color: #15803d;
-  }
-
-  &_error {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-
-  &_loading {
-    background: #e0e7ff;
-    color: #3730a3;
-  }
-}
-
-.auth__methods {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.auth__method-card {
-  background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  appearance: none;
-
-  &:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.auth__method-icon {
-  font-size: 40px;
-  margin-bottom: 12px;
-}
-
-.auth__method-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 4px;
-}
-
-.auth__method-desc {
-  font-size: 12px;
-  color: #6b7280;
-  line-height: 1.4;
-}
-
-.auth__telegram-widget {
-  display: flex;
-  justify-content: center;
-  padding: 40px 0;
-  min-height: 100px;
-}
-
-.auth__telegram-widget :deep(iframe) {
-  max-width: 100%;
-}
-
-.auth__divider {
-  height: 1px;
-  background: #e5e7eb;
-  margin: 24px 0;
-}
-
-.auth__footer {
-  text-align: center;
-  padding-top: 16px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.auth__footer-text {
-  margin: 0;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.auth__switch-link {
-  background: none;
-  border: none;
-  color: #3b82f6;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: none;
-  transition: color 0.2s ease;
-  display: inline;
-  margin-left: 4px;
-
-  &:hover {
-    color: #2563eb;
-    text-decoration: underline;
-  }
-
-  &:active {
-    color: #1d4ed8;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth {
-    padding: 16px;
-  }
-
-  .auth__section {
-    padding: 32px 20px;
-  }
-
-  .auth__title {
-    font-size: 24px;
-  }
-
-  .auth__methods {
-    grid-template-columns: 1fr;
-  }
-} */
 </style>

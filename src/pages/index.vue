@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-      <h1 class="home__title">Управляйте вашим домом легко</h1>
-      <p class="home__subtitle">Все что нужно для комфортной жизни в одном месте</p>
+      <h1 class="home__title h1">Управляйте вашим домом легко</h1>
+      <h2 class="home__subtitle h2">Все что нужно для комфортной жизни в одном месте</h2>
       
       <div v-if="isLoggedIn" class="home__instructions">
           <HomeCard
@@ -47,17 +47,14 @@ const { isLoggedIn } = useAuth();
   align-items: center;
 
   &__title {
-    font-size: var(--eos-font-size-2xl);
-    font-weight: var(--eos-font-weight-bold);
     color: var(--eos-color-primary-700);
     text-align: center;
-    margin-bottom: var(--eos-space-xs);
   }
 
   &__subtitle {
-    font-size: var(--eos-font-size-l);
     color: var(--eos-color-primary-800);
     text-align: center;
+    margin-top: var(--eos-space-xs);
     margin-bottom: var(--eos-space-2xl);
   }
 

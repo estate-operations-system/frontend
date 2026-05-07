@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "eos-ui-kit": {
-      "signature": "ed9b5a983cf5111405d790f11d0668a2",
+      "signature": "aec1f56f5aee9673ab7fd3493faeb21c",
       "file": true,
       "replaced": "^0.4.0"
     }

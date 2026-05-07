@@ -1,10 +1,10 @@
 <template>
   <div class="profile">
     <template v-if="isLoggedIn">
-      <h1 class="profile__title">Ваш профиль</h1>
-      <p class="profile__subtitle">Вы успешно авторизованы в системе</p>
+      <h1 class="profile__title h1">Ваш профиль</h1>
+      <h2 class="profile__subtitle h2">Вы успешно авторизованы в системе</h2>
 
-      <div>
+      <div class="p2">
         Информация о пользователе будет отображаться здесь в будущем. Сейчас это просто заглушка для демонстрации авторизации.
       </div>
       
@@ -19,8 +19,8 @@
     </template>
 
     <template v-else>
-      <h1 class="profile__title">Вход в систему</h1>
-      <p class="profile__subtitle">Выберите способ авторизации</p>
+      <h1 class="profile__title h1">Вход в систему</h1>
+      <h2 class="profile__subtitle h2">Выберите способ авторизации</h2>
 
       <div class="profile__actions">
         <div 
@@ -164,14 +164,11 @@ onMounted(() => {
   border-radius: var(--eos-radius-l);
 
   &__title {
-    font-size: var(--eos-font-size-xl);
-    font-weight: var(--eos-font-weight-bold);
     color: var(--eos-color-primary-700);
     text-align: center;
   }
 
   &__subtitle {
-    font-size: var(--eos-font-size-m);
     color: var(--eos-color-primary-800);
     text-align: center;
     margin-top: var(--eos-space-xs);
