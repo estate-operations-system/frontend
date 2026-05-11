@@ -6,60 +6,60 @@
     />
 
     <div class="auth__card">
-    <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
-      <template v-if="step === 1">
-        <EosInput
-          v-if="emailMode === 'register'"
-          v-model="formData.name"
-          :type="InputType.Text"
-          placeholder="Введите ваше имя"
-          :disabled="isLoading"
-        />
+      <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
+        <template v-if="step === 1">
+          <EosInput
+            v-if="emailMode === 'register'"
+            v-model="formData.name"
+            :type="InputType.Text"
+            placeholder="Введите ваше имя"
+            :disabled="isLoading"
+          />
 
-        <EosInput
-          v-model="formData.email"
-          :type="InputType.Email"
-          placeholder="your@email.com"
-          :disabled="isLoading"
-        />
+          <EosInput
+            v-model="formData.email"
+            :type="InputType.Email"
+            placeholder="Введите вашу почту"
+            :disabled="isLoading"
+          />
 
-        <EosButton 
-          type="submit"
-          :loading="isLoading"
-        >
-          {{'Отправить код'}}
+          <EosButton 
+            type="submit"
+            :loading="isLoading"
+          >
+            {{'Отправить код'}}
+          </EosButton>
+        </template>
+
+        <template v-else-if="step === 2">
+          <EosInput
+            v-model="formData.code"
+            :type="InputType.Text"
+            placeholder="Код из письма"
+            :disabled="isLoading"
+          />
+
+          <EosButton 
+            type="submit"
+            :loading="isLoading"
+          >
+            {{ 'Подтвердить' }}
+          </EosButton>
+        </template>
+      </form>
+
+      <p class="auth__footer p1">
+        {{ emailMode === 'register' 
+          ? 'Уже есть аккаунт?' 
+          : 'Нет аккаунта?' }}
+        <EosButton :variant="ButtonVariant.Tertiary" @click="switchEmailMode">
+          {{
+            emailMode === 'register'
+            ? 'Войти'
+            : 'Зарегистрироваться'
+          }}
         </EosButton>
-      </template>
-
-      <template v-else-if="step === 2">
-        <EosInput
-          v-model="formData.code"
-          :type="InputType.Text"
-          placeholder="Код из письма"
-          :disabled="isLoading"
-        />
-
-        <EosButton 
-          type="submit"
-          :loading="isLoading"
-        >
-          {{ 'Подтвердить' }}
-        </EosButton>
-      </template>
-    </form>
-
-    <p class="auth__footer">
-      {{ emailMode === 'register' 
-        ? 'Уже есть аккаунт?' 
-        : 'Нет аккаунта?' }}
-      <EosButton :variant="ButtonVariant.Tertiary" @click="switchEmailMode">
-        {{
-          emailMode === 'register'
-          ? 'Войти'
-          : 'Зарегистрироваться'
-        }}
-      </EosButton>
-    </p>
+      </p>
     </div>
   </div>
 </template>
@@ -257,16 +257,16 @@ onMounted(() => {
   align-items: center;
 
   &__card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--eos-space-l) var(--eos-space-m);
-  background-color: var(--eos-color-primary-50);
-  width: 100%;
-  height: 100%;
-  border-radius: var(--eos-radius-l);
-  }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--eos-space-l) var(--eos-space-m);
+    background-color: var(--eos-color-primary-50);
+    width: 100%;
+    height: 100%;
+    border-radius: var(--eos-radius-l);
+}
 
   &__form {
     display: flex;
@@ -278,6 +278,7 @@ onMounted(() => {
   &__footer {
     text-align: center;
     padding-top: var(--eos-space-m);
+    color: var(--eos-color-primary-900)
   }
 }
 </style>
