@@ -411,4 +411,11 @@ export class ApiClient {
     const data: paths['/api/tickets']['post']['responses'][201]['content']['application/json'] = json
     return data
   }
+
+  async addTicketComment(id: number, payload: { comment: string }) {
+    return this._request(`${this.baseUrl}/api/tickets/${id}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
 }

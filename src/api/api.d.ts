@@ -572,61 +572,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/dev-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * [DEV ONLY] Получить тестовый JWT токен
-         * @description Только для разработки и тестирования. НЕ ИСПОЛЬЗУЙТЕ В PRODUCTION!
-         */
-        get: {
-            parameters: {
-                query?: {
-                    /** @description ID пользователя для токена */
-                    userId?: number;
-                    /** @description Роль пользователя */
-                    role?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Успешно получен тестовый токен */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            success?: boolean;
-                            token?: string;
-                            refreshToken?: string;
-                        };
-                    };
-                };
-                /** @description Только доступно в development режиме */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/tickets": {
         parameters: {
             query?: never;
@@ -888,6 +833,76 @@ export interface paths {
                 };
             };
         };
+        trace?: never;
+    };
+    "/api/tickets/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Добавить комментарий к заявке */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        comment?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Комментарий добавлен */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Неверные данные */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Не авторизован */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Заявка не найдена */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ошибка сервера */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/users": {

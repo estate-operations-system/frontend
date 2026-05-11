@@ -10,27 +10,29 @@
     <div v-if="isCreateModalOpen" class="modal-overlay" @click.self="closeCreateModal">
       <div class="modal">
         <div class="modal-header">
-          <h2 class="modal-title">Создать заявку</h2>
+          <h2 class="modal-title h3">Создать заявку</h2>
           <EosButton size="small" variant="secondary" @click="closeCreateModal">Закрыть</EosButton>
         </div>
 
         <form class="create-form" @submit.prevent="submitTicket">
-          <div class="field-grid">
-            <div class="field">
-              <label for="category">Категория</label>
-              <input id="category" v-model.trim="form.category" type="text" placeholder="Например, Сантехника" required>
-            </div>
-          </div>
+          <EosInput
+            v-model="form.category"
+            placeholder="Категория"
+            required
+          />
 
-          <div class="field">
-            <label for="address">Адрес</label>
-            <input id="address" v-model.trim="form.address" type="text" placeholder="ул. Ленина, 10, кв. 25" required>
-          </div>
+          <EosInput
+            v-model="form.address"
+            placeholder="Адрес"
+            required
+          />
 
-          <div class="field">
-            <label for="description">Описание</label>
-            <textarea id="description" v-model.trim="form.description" rows="3" placeholder="Опишите проблему" required />
-          </div>
+          <EosInput
+            v-model="form.description"
+            placeholder="Описание проблемы"
+            type="textarea"
+            required
+          />
 
           <div v-if="createError" class="error-message">{{ createError }}</div>
 
@@ -52,7 +54,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import type { components } from '~/api/api'
-import { EosTable, EosButton } from 'eos-ui-kit'
+import { EosTable, EosButton, EosInput } from 'eos-ui-kit'
 import type { TableColumn, TableRow } from 'eos-ui-kit'
 import { useAuth } from '~/composables/useAuth'
 import PageTitle from '~/components/PageTitle.vue'
@@ -76,7 +78,7 @@ const form = ref({
 })
 
 const tableColumns = computed<TableColumn[]>(() => [
-  { id: 'id', name: 'ID' },
+  { id: 'id', name: 'Номер' },
   { id: 'category', name: 'Категория' },
   { id: 'status', name: 'Статус' },
   { id: 'address', name: 'Адрес' },
@@ -186,10 +188,10 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .tickets {
-    display: flex;
+  display: flex;
   flex-direction: column;
   gap: var(--eos-space-l);
-    align-items: center;
+  align-items: center;
 
   &__actions {
     display: flex;
@@ -218,13 +220,15 @@ onMounted(async () => {
   border: 1px solid var(--eos-color-primary-200);
   background: white;
   padding: var(--eos-space-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--eos-space-m);
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--eos-space-m);
   gap: var(--eos-space-m);
 }
 
@@ -239,12 +243,6 @@ onMounted(async () => {
   gap: var(--eos-space-m);
 }
 
-.field-grid {
-  display: grid;
-  gap: var(--eos-space-m);
-  grid-template-columns: 1fr;
-}
-
 .field {
   display: grid;
   gap: var(--eos-space-xs);
@@ -254,28 +252,6 @@ onMounted(async () => {
   font-size: var(--eos-font-size-s);
   color: var(--eos-color-primary-600);
   font-weight: var(--eos-font-weight-medium);
-}
-
-.field input,
-.field textarea {
-  width: 100%;
-  border: 1px solid var(--eos-color-primary-200);
-  border-radius: var(--eos-radius-m);
-  background-color: white;
-  color: var(--eos-color-primary-950);
-  padding: var(--eos-space-s) var(--eos-space-m);
-  font-size: var(--eos-font-size-m);
-  font-family: var(--eos-font-family);
-
-  &:focus {
-    outline: none;
-    border-color: var(--eos-color-primary-500);
-    box-shadow: 0 0 0 3px var(--eos-color-primary-50);
-  }
-}
-
-.field textarea {
-  resize: vertical;
 }
 
 .error-message {
@@ -289,16 +265,5 @@ onMounted(async () => {
 .actions {
   display: flex;
   justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-  .field-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 </style>
