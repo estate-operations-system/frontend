@@ -6,6 +6,7 @@ declare module 'eos-ui-kit' {
     Email = 'email',
     Password = 'password',
     Tel = 'tel',
+    Textarea = 'textarea'
   }
 
   export interface InputProps {
