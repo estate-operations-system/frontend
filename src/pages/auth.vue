@@ -1,11 +1,11 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title h1">{{ emailMode === 'register' ? 'Регистрация' : 'Вход' }}</h1>
-    <h2 class="auth__subtitle h2">{{ emailMode === 'register' 
-        ? 'Создайте новый аккаунт' 
-        : 'Войдите в свой аккаунт' }}
-    </h2>
+    <PageTitle 
+      :title="emailMode === 'register' ? 'Регистрация' : 'Вход'"
+      :subtitle="emailMode === 'register' ? 'Создайте новый аккаунт' : 'Войдите в свой аккаунт'"
+    />
 
+    <div class="auth__card">
     <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
       <template v-if="step === 1">
         <EosInput
@@ -60,6 +60,7 @@
         }}
       </EosButton>
     </p>
+    </div>
   </div>
 </template>
 
@@ -68,6 +69,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
 import { EosButton, EosInput, ButtonVariant, InputType } from 'eos-ui-kit';
+import PageTitle from '~/components/PageTitle.vue';
 
 const { 
   sendRegistrationCode, 
@@ -251,6 +253,12 @@ onMounted(() => {
 .auth {
   display: flex;
   flex-direction: column;
+  gap: var(--eos-space-l);
+  align-items: center;
+
+  &__card {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--eos-space-l) var(--eos-space-m);
@@ -258,16 +266,6 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   border-radius: var(--eos-radius-l);
-
-  &__title {
-    color: var(--eos-color-primary-700);
-    text-align: center;
-  }
-
-  &__subtitle {
-    color: var(--eos-color-primary-800);
-    text-align: center;
-    margin-top: var(--eos-space-xs);
   }
 
   &__form {

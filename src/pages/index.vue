@@ -1,7 +1,9 @@
 <template>
   <div class="home">
-      <h1 class="home__title h1">Управляйте вашим домом легко</h1>
-      <h2 class="home__subtitle h2">Все что нужно для комфортной жизни в одном месте</h2>
+      <PageTitle 
+        title="Управляйте вашим домом легко"
+        subtitle="Все что нужно для комфортной жизни в одном месте"
+      />
       
       <div v-if="isLoggedIn" class="home__instructions">
           <HomeCard
@@ -36,6 +38,7 @@
 <script setup lang="ts">
 import { useAuth } from "~/composables/useAuth";
 import HomeCard from "~/components/HomeCard.vue";
+import PageTitle from "~/components/PageTitle.vue";
 
 const { isLoggedIn } = useAuth();
 </script>
@@ -45,18 +48,7 @@ const { isLoggedIn } = useAuth();
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  &__title {
-    color: var(--eos-color-primary-700);
-    text-align: center;
-  }
-
-  &__subtitle {
-    color: var(--eos-color-primary-800);
-    text-align: center;
-    margin-top: var(--eos-space-xs);
-    margin-bottom: var(--eos-space-2xl);
-  }
+  gap: var(--eos-space-l);
 
   &__instructions {
     width: 100%;
