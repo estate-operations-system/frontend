@@ -28,7 +28,6 @@ defineProps<Props>();
   padding: var(--eos-space-l);
   background-color: var(--eos-color-primary-50);
   text-align: left;
-  border: 1px solid var(--eos-color-border);
   border-radius: var(--eos-radius-m);
   
  &__header {
@@ -59,7 +58,7 @@ defineProps<Props>();
     height: 32px;
     background-color: var(--eos-color-primary-600);
     color: var(--eos-color-primary-50);
-    border-radius: 50%;
+    border-radius: var(--eos-radius-full);
   }
 
   &__title {

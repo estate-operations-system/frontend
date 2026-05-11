@@ -1,12 +1,11 @@
 <template>
   <div class="tickets">
-    <div class="tickets__header">
-      <div>
-        <h1 class="tickets__title h1">Заявки</h1>
-        <h2 class="tickets__subtitle h2">Управление заявками и их статусами</h2>
-      </div>
+    <PageTitle 
+      title="Заявки"
+      subtitle="Управление заявками и их статусами"
+    >
       <EosButton @click="openCreateModal">Создать заявку</EosButton>
-    </div>
+    </PageTitle>
 
     <div v-if="isCreateModalOpen" class="modal-overlay" @click.self="closeCreateModal">
       <div class="modal">
@@ -56,6 +55,7 @@ import type { components } from '~/api/api'
 import { EosTable, EosButton } from 'eos-ui-kit'
 import type { TableColumn, TableRow } from 'eos-ui-kit'
 import { useAuth } from '~/composables/useAuth'
+import PageTitle from '~/components/PageTitle.vue'
 
 type Ticket = components["schemas"]["Ticket"]
 
@@ -186,20 +186,10 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .tickets {
-  &__header {
     display: flex;
+  flex-direction: column;
+  gap: var(--eos-space-l);
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--eos-space-l);
-  }
-
-  &__title {
-    color: var(--eos-color-primary-700);
-  }
-
-  &__subtitle {
-    color: var(--eos-color-primary-800);
-  }
 
   &__actions {
     display: flex;

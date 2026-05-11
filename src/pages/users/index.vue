@@ -1,8 +1,10 @@
 <template>
   <div class="users">
-    <h1 class="users__title h1">Пользователи</h1>
-    <h2 class="users__subtitle h2">Управление жильцами и их профилями</h2>
-      
+    <PageTitle 
+      :title="'Пользователи'"
+      :subtitle="'Управление жильцами и их профилями'"
+    />
+
     <EosTable :columns="tableColumns" :rows="tableRows" clickable @rowClick="handleRowClick" />
   </div>
 </template>
@@ -14,6 +16,7 @@ import { ApiClient } from '~/api/apiClient'
 import type { components } from '~/api/api'
 import { EosTable } from 'eos-ui-kit'
 import type { TableColumn, TableRow } from 'eos-ui-kit'
+import PageTitle from '~/components/PageTitle.vue'
 
 type User = components["schemas"]["User"]
 
@@ -59,16 +62,9 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .users {
-  &__title {
-    color: var(--eos-color-primary-700);
-    text-align: center;
-  }
-
-  &__subtitle {
-    color: var(--eos-color-primary-800);
-    text-align: center;
-    margin-top: var(--eos-space-xs);
-    margin-bottom: var(--eos-space-l);
-  }
+  display: flex;
+  flex-direction: column;
+  gap: var(--eos-space-l);
+  align-items: center;
 }
 </style>

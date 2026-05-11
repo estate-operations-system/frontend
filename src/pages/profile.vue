@@ -1,9 +1,11 @@
 <template>
   <div class="profile">
-    <template v-if="isLoggedIn">
-      <h1 class="profile__title h1">Ваш профиль</h1>
-      <h2 class="profile__subtitle h2">Вы успешно авторизованы в системе</h2>
+    <PageTitle 
+      :title="isLoggedIn ? 'Ваш профиль' : 'Вход в систему'"
+      :subtitle="isLoggedIn ? 'Вы успешно авторизованы в системе' : 'Выберите способ авторизации'"
+    />
 
+    <div v-if="isLoggedIn" class="profile__card">
       <div class="p2">
         Информация о пользователе будет отображаться здесь в будущем. Сейчас это просто заглушка для демонстрации авторизации.
       </div>
@@ -16,12 +18,9 @@
           На главную
         </EosButton>
       </div>
-    </template>
+    </div>
 
-    <template v-else>
-      <h1 class="profile__title h1">Вход в систему</h1>
-      <h2 class="profile__subtitle h2">Выберите способ авторизации</h2>
-
+    <div v-else class="profile__card">
       <div class="profile__actions">
         <div 
           id="telegram-login-widget"
@@ -36,7 +35,7 @@
           На главную
         </EosButton>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
@@ -45,6 +44,7 @@ import { useRouter } from "vue-router";
 import { ref, onMounted, nextTick } from "vue";
 import { useAuth } from "~/composables/useAuth";
 import { ButtonVariant, EosButton } from "eos-ui-kit";
+import PageTitle from "~/components/PageTitle.vue";
 
 const router = useRouter();
 const config = useRuntimeConfig();
@@ -155,23 +155,19 @@ onMounted(() => {
 .profile {
   display: flex;
   flex-direction: column;
+  gap: var(--eos-space-l);
   align-items: center;
-  justify-content: center;
-  padding: var(--eos-space-l) var(--eos-space-m);
-  background-color: var(--eos-color-primary-50);
-  width: 100%;
-  height: 100%;
-  border-radius: var(--eos-radius-l);
 
-  &__title {
-    color: var(--eos-color-primary-700);
-    text-align: center;
-  }
-
-  &__subtitle {
-    color: var(--eos-color-primary-800);
-    text-align: center;
-    margin-top: var(--eos-space-xs);
+  &__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--eos-space-l) var(--eos-space-m);
+    background-color: var(--eos-color-primary-50);
+    width: 100%;
+    height: 100%;
+    border-radius: var(--eos-radius-l);
   }
 
   &__actions {

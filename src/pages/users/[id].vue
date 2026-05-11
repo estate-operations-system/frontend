@@ -12,23 +12,25 @@
         <div class="user__header-info">
           <h1 class="h1">{{ user.name }}</h1>
           <!-- TODO: добавить тег для роли пользователя -->
-          <span>
-            {{ user.role || 'Жилец' }}
+          <span class="p1">
+            {{ user.role }}
           </span>
         </div>
     </div>
 
     <section class="user__info">
       <h2 class="user__info-title h2">Информация о пользователе:</h2>
-      <div v-if="user.telegram_username" class="p1" style="display: inline-block;">
-        Телеграм: 
-        <EosButton :variant="ButtonVariant.Tertiary" @click="openTelegram">
-          @{{ user.telegram_username }}
-        </EosButton>
+      <div class="user__contacts">
+        <div v-if="user.telegram_username" class="p1" style="display: inline-block;">
+          Телеграм: 
+          <EosButton :variant="ButtonVariant.Tertiary" @click="openTelegram">
+            @{{ user.telegram_username }}
+          </EosButton>
+        </div>
+        <div v-if="user.email" class="p1">Почта: {{ user.email }}</div>
+        <div v-if="user.phoneNumber" class="p1">Телефон: {{ user.phoneNumber }}</div>
+        <div v-if="user.address" class="p1">Адрес: {{ user.address }}</div>
       </div>
-      <div v-if="user.email" class="p1">Почта: {{ user.email }}</div>
-      <div v-if="user.phoneNumber" class="p1">Телефон: {{ user.phoneNumber }}</div>
-      <div v-if="user.address" class="p1">Адрес: {{ user.address }}</div>
     </section>
 
     <section v-if="isAdmin" class="user__role-management">
@@ -131,7 +133,6 @@ onMounted(async () => {
 .user {
   max-width: 1000px;
   margin: 0 auto;
-  padding: var(--eos-space-l) var(--eos-space-m);
   display: flex;
   flex-direction: column;
   gap: var(--eos-space-l);
@@ -152,7 +153,6 @@ onMounted(async () => {
   }
 
   &__avatar {
-
     &-placeholder {
       width: 64px;
       height: 64px;
@@ -172,21 +172,28 @@ onMounted(async () => {
     padding: var(--eos-space-l);
 
     &-title {
-      margin-bottom: var(--eos-space-xs);
+      margin-bottom: var(--eos-space-m);
+      color: var(--eos-color-primary-700)
     }
+  }
+
+  &__contacts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--eos-space-s);
   }
 
   &__role-management {
     background: var(--eos-color-primary-50);
     border-radius: var(--eos-radius-l);
-    overflow: hidden;
     padding: var(--eos-space-l);
     display: flex;
     flex-direction: column;
     gap: var(--eos-space-s);
 
     &-title {
-      margin-bottom: var(--eos-space-xs);
+      margin-bottom: var(--eos-space-s);
+      color: var(--eos-color-primary-700)
     }
 
     .button,

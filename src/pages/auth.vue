@@ -1,65 +1,66 @@
 <template>
   <div class="auth">
-    <h1 class="auth__title h1">{{ emailMode === 'register' ? 'Регистрация' : 'Вход' }}</h1>
-    <h2 class="auth__subtitle h2">{{ emailMode === 'register' 
-        ? 'Создайте новый аккаунт' 
-        : 'Войдите в свой аккаунт' }}
-    </h2>
+    <PageTitle 
+      :title="emailMode === 'register' ? 'Регистрация' : 'Вход'"
+      :subtitle="emailMode === 'register' ? 'Создайте новый аккаунт' : 'Войдите в свой аккаунт'"
+    />
 
-    <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
-      <template v-if="step === 1">
-        <EosInput
-          v-if="emailMode === 'register'"
-          v-model="formData.name"
-          :type="InputType.Text"
-          placeholder="Введите ваше имя"
-          :disabled="isLoading"
-        />
+    <div class="auth__card">
+      <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
+        <template v-if="step === 1">
+          <EosInput
+            v-if="emailMode === 'register'"
+            v-model="formData.name"
+            :type="InputType.Text"
+            placeholder="Введите ваше имя"
+            :disabled="isLoading"
+          />
 
-        <EosInput
-          v-model="formData.email"
-          :type="InputType.Email"
-          placeholder="your@email.com"
-          :disabled="isLoading"
-        />
+          <EosInput
+            v-model="formData.email"
+            :type="InputType.Email"
+            placeholder="Введите вашу почту"
+            :disabled="isLoading"
+          />
 
-        <EosButton 
-          type="submit"
-          :loading="isLoading"
-        >
-          {{'Отправить код'}}
+          <EosButton 
+            type="submit"
+            :loading="isLoading"
+          >
+            {{'Отправить код'}}
+          </EosButton>
+        </template>
+
+        <template v-else-if="step === 2">
+          <EosInput
+            v-model="formData.code"
+            :type="InputType.Text"
+            placeholder="Код из письма"
+            :disabled="isLoading"
+          />
+
+          <EosButton 
+            type="submit"
+            :loading="isLoading"
+          >
+            {{ 'Подтвердить' }}
+          </EosButton>
+        </template>
+      </form>
+
+      <p class="auth__footer p1">
+        {{ emailMode === 'register' 
+          ? 'Уже есть аккаунт?' 
+          : 'Нет аккаунта?' }}
+        <EosButton :variant="ButtonVariant.Tertiary" @click="switchEmailMode">
+          {{
+            emailMode === 'register'
+            ? 'Войти'
+            : 'Зарегистрироваться'
+          }}
         </EosButton>
-      </template>
-
-      <template v-else-if="step === 2">
-        <EosInput
-          v-model="formData.code"
-          :type="InputType.Text"
-          placeholder="Код из письма"
-          :disabled="isLoading"
-        />
-
-        <EosButton 
-          type="submit"
-          :loading="isLoading"
-        >
-          {{ 'Подтвердить' }}
-        </EosButton>
-      </template>
-    </form>
-
-    <p class="auth__footer">
-      {{ emailMode === 'register' 
-        ? 'Уже есть аккаунт?' 
-        : 'Нет аккаунта?' }}
-      <EosButton :variant="ButtonVariant.Tertiary" @click="switchEmailMode">
-        {{
-          emailMode === 'register'
-          ? 'Войти'
-          : 'Зарегистрироваться'
-        }}
-      </EosButton>
-    </p>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -68,6 +69,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
 import { EosButton, EosInput, ButtonVariant, InputType } from 'eos-ui-kit';
+import PageTitle from '~/components/PageTitle.vue';
 
 const { 
   sendRegistrationCode, 
@@ -251,24 +253,20 @@ onMounted(() => {
 .auth {
   display: flex;
   flex-direction: column;
+  gap: var(--eos-space-l);
   align-items: center;
-  justify-content: center;
-  padding: var(--eos-space-l) var(--eos-space-m);
-  background-color: var(--eos-color-primary-50);
-  width: 100%;
-  height: 100%;
-  border-radius: var(--eos-radius-l);
 
-  &__title {
-    color: var(--eos-color-primary-700);
-    text-align: center;
-  }
-
-  &__subtitle {
-    color: var(--eos-color-primary-800);
-    text-align: center;
-    margin-top: var(--eos-space-xs);
-  }
+  &__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--eos-space-l) var(--eos-space-m);
+    background-color: var(--eos-color-primary-50);
+    width: 100%;
+    height: 100%;
+    border-radius: var(--eos-radius-l);
+}
 
   &__form {
     display: flex;
@@ -280,6 +278,7 @@ onMounted(() => {
   &__footer {
     text-align: center;
     padding-top: var(--eos-space-m);
+    color: var(--eos-color-primary-900)
   }
 }
 </style>
