@@ -839,61 +839,6 @@
         }
       }
     },
-    "/api/auth/dev-token": {
-      "get": {
-        "summary": "[DEV ONLY] Получить тестовый JWT токен",
-        "tags": [
-          "Auth"
-        ],
-        "description": "Только для разработки и тестирования. НЕ ИСПОЛЬЗУЙТЕ В PRODUCTION!",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "userId",
-            "schema": {
-              "type": "integer",
-              "default": 1
-            },
-            "description": "ID пользователя для токена"
-          },
-          {
-            "in": "query",
-            "name": "role",
-            "schema": {
-              "type": "string",
-              "default": "admin"
-            },
-            "description": "Роль пользователя"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Успешно получен тестовый токен",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "token": {
-                      "type": "string"
-                    },
-                    "refreshToken": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Только доступно в development режиме"
-          }
-        }
-      }
-    },
     "/api/tickets": {
       "post": {
         "summary": "Создать новую заявку",
@@ -1072,6 +1017,56 @@
           },
           "403": {
             "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Заявка не найдена"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/api/tickets/{id}/comments": {
+      "post": {
+        "summary": "Добавить комментарий к заявке",
+        "tags": [
+          "Tickets"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comment": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Комментарий добавлен"
+          },
+          "400": {
+            "description": "Неверные данные"
+          },
+          "401": {
+            "description": "Не авторизован"
           },
           "404": {
             "description": "Заявка не найдена"
