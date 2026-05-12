@@ -5,7 +5,7 @@
       :subtitle="emailMode === 'register' ? 'Создайте новый аккаунт' : 'Войдите в свой аккаунт'"
     />
 
-    <div class="auth__card">
+    <EosCard>
       <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
         <template v-if="step === 1">
           <EosInput
@@ -60,7 +60,7 @@
           }}
         </EosButton>
       </p>
-    </div>
+    </EosCard>
   </div>
 </template>
 
@@ -68,7 +68,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
-import { EosButton, EosInput, ButtonVariant, InputType } from 'eos-ui-kit';
+import { EosButton, EosInput, ButtonVariant, InputType, EosCard } from 'eos-ui-kit';
 import PageTitle from '~/components/PageTitle.vue';
 
 const { 
@@ -256,28 +256,14 @@ onMounted(() => {
   gap: var(--eos-space-l);
   align-items: center;
 
-  &__card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--eos-space-l) var(--eos-space-m);
-    background-color: var(--eos-color-primary-50);
-    width: 100%;
-    height: 100%;
-    border-radius: var(--eos-radius-l);
-}
-
   &__form {
     display: flex;
     flex-direction: column;
     gap: var(--eos-space-m);
-    margin-top: var(--eos-space-xl);
   }
 
   &__footer {
     text-align: center;
-    padding-top: var(--eos-space-m);
     color: var(--eos-color-primary-900)
   }
 }
