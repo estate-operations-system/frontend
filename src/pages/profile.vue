@@ -5,7 +5,7 @@
       :subtitle="isLoggedIn ? 'Вы успешно авторизованы в системе' : 'Выберите способ авторизации'"
     />
 
-    <div v-if="isLoggedIn" class="profile__card">
+    <EosCard v-if="isLoggedIn">
       <div class="p2">
         Информация о пользователе будет отображаться здесь в будущем. Сейчас это просто заглушка для демонстрации авторизации.
       </div>
@@ -18,11 +18,12 @@
           На главную
         </EosButton>
       </div>
-    </div>
+    </EosCard>
 
-    <div v-else class="profile__card">
+    <EosCard v-else>
       <div class="profile__actions">
         <div 
+          v-if="isTelegramWidgetLoaded"
           id="telegram-login-widget"
           class="telegram-widget"
         />
@@ -35,7 +36,7 @@
           На главную
         </EosButton>
       </div>
-    </div>
+    </EosCard>
   </div>
 </template>
 
@@ -43,7 +44,7 @@
 import { useRouter } from "vue-router";
 import { ref, onMounted, nextTick } from "vue";
 import { useAuth } from "~/composables/useAuth";
-import { ButtonVariant, EosButton } from "eos-ui-kit";
+import { ButtonVariant, EosButton, EosCard } from "eos-ui-kit";
 import PageTitle from "~/components/PageTitle.vue";
 
 const router = useRouter();
@@ -53,6 +54,7 @@ const { isLoggedIn, logout, isLoading } = useAuth();
 const authStatus = ref('');
 const authStatusClass = ref('');
 const botUsername = ref(config.public.telegramBotUsername || 'your_bot_username');
+const isTelegramWidgetLoaded = ref(false);
 
 (window as any).onTelegramAuthProfile = async (user: any) => {
   console.log('Telegram auth callback received:', user);
@@ -117,10 +119,12 @@ const loadTelegramWidget = () => {
   
   script.onload = () => {
     console.log('Telegram widget script loaded and rendered');
+    isTelegramWidgetLoaded.value = true;
   };
   
   script.onerror = (error) => {
     console.error('Failed to load Telegram widget:', error);
+    isTelegramWidgetLoaded.value = false;
     authStatus.value = 'Ошибка загрузки Telegram виджета. Проверьте настройки бота.';
     authStatusClass.value = 'error';
   };
@@ -158,23 +162,11 @@ onMounted(() => {
   gap: var(--eos-space-l);
   align-items: center;
 
-  &__card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--eos-space-l) var(--eos-space-m);
-    background-color: var(--eos-color-primary-50);
-    width: 100%;
-    height: 100%;
-    border-radius: var(--eos-radius-l);
-  }
-
   &__actions {
     display: flex;
     flex-direction: column;
+    width: min-content;
     gap: var(--eos-space-m);
-    margin-top: var(--eos-space-2xl);
   }
 }
 </style>

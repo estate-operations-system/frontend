@@ -1,16 +1,16 @@
 <template>
-  <div class="home-card" :class="{ 'home-card_center': align === 'center' }">
+  <EosCard :size="size" :align="align" class="home-card__card">
     <div class="home-card__header">
       <div v-if="number" class="home-card__number h2">{{ number }}</div>
       <h3 class="home-card__title h2">{{ title }}</h3>
     </div>
     <p class="home-card__description p1">{{ description }}</p>
     <EosButton :to="to">{{ buttonText }}</EosButton>
-  </div>
+  </EosCard>
 </template>
 
 <script setup lang="ts">
-import { EosButton } from "eos-ui-kit";
+import { EosButton, EosCard } from "eos-ui-kit";
 interface Props {
   number?: number;
   title: string;
@@ -18,6 +18,7 @@ interface Props {
   to: string;
   buttonText: string;
   align?: "left" | "center";
+  size?: "s" | "m" | "l";
 }
 
 defineProps<Props>();
@@ -25,10 +26,9 @@ defineProps<Props>();
 
 <style lang="scss" scoped>
 .home-card {
-  padding: var(--eos-space-l);
-  background-color: var(--eos-color-primary-50);
-  text-align: left;
-  border-radius: var(--eos-radius-m);
+  &__card {
+    min-width: unset;
+  }
   
  &__header {
     display: flex;
@@ -38,24 +38,12 @@ defineProps<Props>();
     gap: var(--eos-space-m);
   }
 
-  &_center {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    .home-card__header {
-      justify-content: center;
-    }
-  }
-
   &__number {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: calc(var(--eos-line-height-tight) * var(--eos-font-size-xl));
+    height: calc(var(--eos-line-height-tight) * var(--eos-font-size-xl));
     background-color: var(--eos-color-primary-600);
     color: var(--eos-color-primary-50);
     border-radius: var(--eos-radius-full);
@@ -67,8 +55,6 @@ defineProps<Props>();
 
   &__description {
     color: var(--eos-color-primary-800);
-    margin: var(--eos-space-m) 0;
-    line-height: var(--eos-line-height-normal);
   }
 }
 </style>

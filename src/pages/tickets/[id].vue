@@ -5,7 +5,7 @@
       :subtitle="ticket.category"
     />
 
-    <section class="ticket__info">
+    <EosCard class="ticket__info" align="left" size="m">
       <h2 class="ticket__info-title h2">Основная информация</h2>
       <div class="ticket__info-grid">
         <div class="ticket__info-item">
@@ -18,23 +18,23 @@
         </div>
         <div class="ticket__info-item">
           <span class="p2">ID жильца</span>
-          <NuxtLink :to="`/users/${ticket.resident_id}`" class="ticket__link">
-            <p class="p1">{{ ticket.resident_id }}</p>
-          </NuxtLink>
+          <EosButton :variant="ButtonVariant.Tertiary" :to="`/users/${ticket.resident_id}`" class="ticket__link">
+            {{ ticket.resident_id }}
+          </EosButton>
         </div>
         <div class="ticket__info-item">
           <span class="p2">Дата создания</span>
           <p class="p1">{{ formatDate(ticket.created_at) }}</p>
         </div>
       </div>
-    </section>
+    </EosCard>
 
-    <section class="ticket__description" v-if="ticket.description">
-      <h2 class="ticket__description-title h2">Описание</h2>
+    <EosCard v-if="ticket.description" align="left" size="m">
+      <h2 class="h2">Описание</h2>
       <p class="p1">{{ ticket.description }}</p>
-    </section>
+    </EosCard>
 
-    <section v-if="isAdmin || ticket.comments" class="info-section">
+    <EosCard v-if="isAdmin || ticket.comments" align="left" size="m">
       <EosTabs 
         v-model="activeTab"
         :tabs="tabItems"
@@ -52,7 +52,6 @@
             <EosButton 
               type="submit" 
               :disabled="submittingComment || !newComment"
-              variant="primary"
             >
               {{ submittingComment ? 'Отправка...' : 'Отправить' }}
             </EosButton>
@@ -95,8 +94,8 @@
         <div v-if="statusError" class="ticket__error p2 text-error">{{ statusError }}</div>
         <div v-if="statusSuccess" class="ticket__success p2 text-success">Статус успешно обновлен</div>
 
-        <div v-if="ticket.statusHistory" class="status-history-section">
-          <h3 class="status-history-title">История изменений статуса</h3>
+        <div v-if="ticket.statusHistory" class="status-history">
+          <h3 class="h3">История изменений статуса</h3>
           <div class="status-history">
             <div
               v-for="history in [...ticket.statusHistory].reverse()"
@@ -118,7 +117,7 @@
           </div>
         </div>
       </div>
-    </section>
+    </EosCard>
 
     <div class="ticket__actions">
       <NuxtLink to="/tickets">
@@ -140,7 +139,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import { useAuth } from '~/composables/useAuth'
-import { EosButton, EosSelect, EosInput, InputType, EosTabs } from 'eos-ui-kit'
+import { EosButton, EosSelect, EosInput, InputType, EosTabs, EosCard, ButtonVariant } from 'eos-ui-kit'
 import type { SelectOption, TabItem } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
@@ -311,35 +310,21 @@ const submitComment = async () => {
   gap: var(--eos-space-l);
 
   &__info {
-    background: var(--eos-color-primary-50);
-    border-radius: var(--eos-radius-l);
-    padding: var(--eos-space-l);
-
     &-title {
-      margin-bottom: var(--eos-space-m);
       color: var(--eos-color-primary-800)
     }
 
     &-grid {
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--eos-space-l);
+      gap: var(--eos-space-m);
     }
 
     &-item {
       display: flex;
       flex-direction: column;
       gap: var(--eos-space-xs);
-    }
-  }
-
-  &__description {
-    background: var(--eos-color-primary-50);
-    border-radius: var(--eos-radius-l);
-    padding: var(--eos-space-l);
-
-    &-title {
-      margin-bottom: var(--eos-space-m);
     }
   }
 
@@ -369,15 +354,6 @@ const submitComment = async () => {
     gap: var(--eos-space-m);
   }
 
-  &__link {
-    text-decoration: none;
-    color: inherit;
-
-    &:hover p {
-      color: var(--eos-color-primary-500);
-    }
-  }
-
   &__empty {
     max-width: 1000px;
     margin: 0 auto;
@@ -388,42 +364,17 @@ const submitComment = async () => {
     gap: var(--eos-space-l);
     align-items: center;
   }
-}
 
-.info-section {
-  background: var(--eos-color-primary-50);
-  border-radius: var(--eos-radius-l);
-  padding: var(--eos-space-l);
-  display: flex;
-  flex-direction: column;
-  gap: var(--eos-space-m);
+  &__link {
+    justify-content: flex-start;
+  }
 }
 
 .section-content {
   display: flex;
   flex-direction: column;
   gap: var(--eos-space-m);
-}
-
-.section-title {
-  font-size: var(--eos-font-size-l);
-  font-weight: var(--eos-font-weight-semibold);
-  color: var(--eos-color-primary-800);
-  margin: 0;
-}
-
-.status-history-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--eos-space-m);
-  margin-top: var(--eos-space-l);
-}
-
-.status-history-title {
-  font-size: var(--eos-font-size-m);
-  font-weight: var(--eos-font-weight-semibold);
-  color: var(--eos-color-primary-800);
-  margin: 0;
+  width: 100%;
 }
 
 .status-history {

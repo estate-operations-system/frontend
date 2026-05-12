@@ -12,6 +12,8 @@
             description="Перейдите в раздел 'Пользователи' для управления профилями жильцов и просмотра информации"
             to="/users"
             buttonText="Перейти к пользователям"
+            size="m"
+            align="left"
           />
           
           <HomeCard
@@ -20,6 +22,8 @@
             description="В разделе 'Заявки' вы сможете просматривать, редактировать и управлять заявками от жильцов"
             to="/tickets"
             buttonText="Перейти к заявкам"
+            size="m"
+            align="left"
           />
       </div>
 
@@ -30,6 +34,7 @@
           to="/profile"
           buttonText="Авторизоваться"
           align="center"
+          size="l"
         />
       </div>
   </div>

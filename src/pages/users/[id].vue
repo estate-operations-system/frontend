@@ -1,6 +1,6 @@
 <template>
   <div v-if="user" class="user">
-    <div class="user__header" :style="{ backgroundColor: headerBgColor }">
+    <EosCard class="user__header" align="left" size="m" :style="{ backgroundColor: headerBgColor }">
         <div class="user__avatar">
           <div v-if="user.avatar">
             <!-- TODO: добавить поддержку загрузки аватаров -->
@@ -16,10 +16,10 @@
             {{ user.role }}
           </span>
         </div>
-    </div>
+    </EosCard>
 
-    <section class="user__info">
-      <h2 class="user__info-title h2">Информация о пользователе:</h2>
+    <EosCard  size="m" align="left">
+      <h2 class="user__title h2">Информация о пользователе:</h2>
       <div class="user__contacts">
         <div v-if="user.telegram_username" class="p1" style="display: inline-block;">
           Телеграм: 
@@ -31,22 +31,23 @@
         <div v-if="user.phoneNumber" class="p1">Телефон: {{ user.phoneNumber }}</div>
         <div v-if="user.address" class="p1">Адрес: {{ user.address }}</div>
       </div>
-    </section>
+    </EosCard>
 
-    <section v-if="isAdmin" class="user__role-management">
+    <EosCard v-if="isAdmin"  size="m" align="left">
       <h2 class="user__role-management-title h2">Управление ролью</h2>
       <p class="p1">Текущая роль: {{ user.role || 'Жилец' }}</p>
-      <select v-model="selectedRole">
-        <option value="жилец">жилец</option>
-        <option value="юрист">юрист</option>
-        <option value="администратор">администратор</option>
-      </select>
-      <EosButton 
-        @click="updateRole"
-      >
-        Сохранить
-      </EosButton>
-    </section>
+      <div class="user__actions">
+        <EosSelect 
+          v-model="selectedRole"
+          :options="roleOptions"
+        />
+        <EosButton 
+          @click="updateRole"
+        >
+          Сохранить
+        </EosButton>
+      </div>
+    </EosCard>
   </div>
 </template>
 
@@ -55,7 +56,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import { useAuth } from '~/composables/useAuth'
-import { EosButton, ButtonVariant } from 'eos-ui-kit'
+import { EosButton, EosSelect, EosCard, ButtonVariant } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
 type User = components["schemas"]["User"]
@@ -74,6 +75,12 @@ const isAdmin = computed(() => {
   const role = getUserRole()
   return role === 'администратор'
 })
+
+const roleOptions = computed(() => [
+  { label: 'жилец', value: 'жилец' },
+  { label: 'юрист', value: 'юрист' },
+  { label: 'администратор', value: 'администратор' }
+])
 
 const headerBgColor = computed(() => {
   const color = user.value?.color || '#ad6952'
@@ -139,11 +146,9 @@ onMounted(async () => {
 
   &__header {
     display: flex;
+    flex-direction: row;
     align-items: center;
     color: var(--eos-color-primary-800);
-    padding: var(--eos-space-l);
-    border-radius: var(--eos-radius-l);
-    gap: var(--eos-space-l);
 
     &-info {
       display: flex;
@@ -165,16 +170,8 @@ onMounted(async () => {
     }
   }
 
-  &__info {
-    background: var(--eos-color-primary-50);
-    border-radius: var(--eos-radius-l);
-    overflow: hidden;
-    padding: var(--eos-space-l);
-
-    &-title {
-      margin-bottom: var(--eos-space-m);
-      color: var(--eos-color-primary-700)
-    }
+  &__title {
+    color: var(--eos-color-primary-700);
   }
 
   &__contacts {
@@ -183,23 +180,10 @@ onMounted(async () => {
     gap: var(--eos-space-s);
   }
 
-  &__role-management {
-    background: var(--eos-color-primary-50);
-    border-radius: var(--eos-radius-l);
-    padding: var(--eos-space-l);
+  &__actions {
     display: flex;
-    flex-direction: column;
-    gap: var(--eos-space-s);
-
-    &-title {
-      margin-bottom: var(--eos-space-s);
-      color: var(--eos-color-primary-700)
-    }
-
-    .button,
-    select {
-      width: fit-content;
-    }
+    gap: var(--eos-space-s); 
+    width: min-content;
   }
 }
 </style>
