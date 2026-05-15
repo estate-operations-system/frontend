@@ -1,5 +1,6 @@
 <template>
-  <div class="tickets">
+  <Loader v-if="isLoading" />
+  <div v-else class="tickets">
     <PageTitle 
       title="Заявки"
       subtitle="Управление заявками и их статусами"
@@ -63,12 +64,13 @@ type Ticket = components["schemas"]["Ticket"]
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const router = useRouter()
-const { getUserRole, user, loadCurrentUser } = useAuth()
+const { user, loadCurrentUser } = useAuth()
 
 const tickets = ref<Ticket[]>([])
 const isCreateModalOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | null>(null)
+const isLoading = ref(true);
 
 const form = ref({
   category: '',
@@ -117,6 +119,8 @@ const fetchTickets = async () => {
     tickets.value = res.data ?? []
   } catch (e: any) {
     createError.value = e.message || 'Ошибка загрузки'
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -126,7 +130,6 @@ const handleRowClick = (row: TableRow) => {
 
 const openCreateModal = () => {
   createError.value = null
-  console.log('openCreateModal - user:', user.value)
   form.value.resident_id = user.value?.id
   isCreateModalOpen.value = true
 }
@@ -190,13 +193,13 @@ onMounted(async () => {
 .tickets {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
   align-items: center;
 
   &__actions {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: var(--eos-space-l);
+    margin-bottom: var(--eos-spacing-l);
   }
 }
 
@@ -208,7 +211,7 @@ onMounted(async () => {
   justify-content: center;
   background: rgba(0, 0, 0, 0.4);
   z-index: 50;
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
 }
 
 .modal {
@@ -219,17 +222,17 @@ onMounted(async () => {
   border-radius: var(--eos-radius-l);
   border: 1px solid var(--eos-color-primary-200);
   background: white;
-  padding: var(--eos-space-l);
+  padding: var(--eos-spacing-l);
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .modal-title {
@@ -240,12 +243,12 @@ onMounted(async () => {
 
 .create-form {
   display: grid;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .field {
   display: grid;
-  gap: var(--eos-space-xs);
+  gap: var(--eos-spacing-xs);
 }
 
 .field label {
@@ -255,7 +258,7 @@ onMounted(async () => {
 }
 
 .error-message {
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   background-color: var(--eos-color-error-light);
   color: var(--eos-color-error);
   border-radius: var(--eos-radius-m);
@@ -267,3 +270,4 @@ onMounted(async () => {
   justify-content: flex-end;
 }
 </style>
+

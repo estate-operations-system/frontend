@@ -24,7 +24,7 @@ const { isLoggedIn } = useAuth();
 .header {
   max-width: 1600px;
   margin: 0 auto;
-  padding: var(--eos-space-m) var(--eos-space-l);
+  padding: var(--eos-spacing-m) var(--eos-spacing-l);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,7 +52,7 @@ const { isLoggedIn } = useAuth();
 
   &__links {
     display: flex;
-    gap: var(--eos-space-xl);
+    gap: var(--eos-spacing-xl);
     align-items: center;
     position: absolute;
     left: 50%;
@@ -86,3 +86,4 @@ const { isLoggedIn } = useAuth();
   }
 }
 </style>
+

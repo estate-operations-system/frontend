@@ -35,7 +35,7 @@ defineProps<Props>();
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 
   &__number {
@@ -58,3 +58,4 @@ defineProps<Props>();
   }
 }
 </style>
+

@@ -36,7 +36,7 @@ html {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-top: var(--eos-space-m);
+  padding-top: var(--eos-spacing-m);
   font-family: 'Nunito', sans-serif;
 
   &__home {
@@ -48,10 +48,11 @@ html {
   }
 
   &__content {
-    padding-block: var(--eos-space-l);
+    padding-block: var(--eos-spacing-l);
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
   }
 }
 </style>
+

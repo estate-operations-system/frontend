@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
-    "eos-ui-kit": "file:.yalc/eos-ui-kit",
+    "eos-ui-kit": "1.0.0",
     "nuxt": "^4.2.1",
     "primevue": "^4.5.4",
     "sass-embedded": "^1.99.0",

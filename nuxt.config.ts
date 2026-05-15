@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   ssr: false,
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:4000/',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://backend-pl4x.onrender.com/',
       botToken: process.env.NUXT_PUBLIC_BOT_TOKEN || 'your_bot_token',
       telegramBotUsername:
         process.env.NUXT_PUBLIC_TELEGRAM_BOT_USERNAME || 'your_bot_username',

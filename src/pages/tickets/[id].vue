@@ -1,5 +1,6 @@
 <template>
-  <div v-if="ticket" class="ticket">
+  <Loader v-if="isLoading"/>
+  <div v-else-if="ticket" class="ticket">
     <PageTitle 
       :title="'Заявка #' + ticket.id"
       :subtitle="ticket.category"
@@ -126,7 +127,7 @@
     </div>
   </div>
 
-  <div v-else class="ticket__empty">
+  <div v-else-if="!ticket" class="ticket__empty">
     <p class="p1 text-secondary">Заявка не найдена</p>
     <NuxtLink to="/tickets">
       <EosButton variant="secondary">Вернуться к списку</EosButton>
@@ -135,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import { useAuth } from '~/composables/useAuth'
@@ -147,13 +148,15 @@ type Ticket = components["schemas"]["Ticket"]
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const route = useRoute()
-const { getUserRole, user: authUser } = useAuth()
+const { user: authUser } = useAuth()
 
 const ticket = ref<Ticket | null>(null)
 const selectedStatus = ref('open')
 const updatingStatus = ref(false)
 const statusError = ref<string | null>(null)
 const statusSuccess = ref(false)
+const hasUnreadUpdates = ref(false)
+const isLoading = ref(true)
 
 const statusOptions: SelectOption[] = [
   { label: 'В работе', value: 'В работе' },
@@ -179,7 +182,7 @@ const submittingComment = ref(false)
 const commentError = ref('')
 
 const isAdmin = computed(() => {
-  const role = getUserRole()
+  const role = authUser.value?.role
   return role === 'администратор'
 })
 
@@ -237,6 +240,8 @@ onMounted(async () => {
     }
   } catch (e: any) {
     console.error('Error loading ticket:', e)
+  } finally {
+    isLoading.value = false
   }
 })
 
@@ -271,13 +276,9 @@ const submitComment = async () => {
     submittingComment.value = true
     commentError.value = ''
 
-    console.log('newComment', newComment.value)
-
     const response = await api.addTicketComment(ticket.value!.id, {
       comment: newComment.value
     })
-    
-    console.log('response', response);
 
     if (response?.success) {
       // Добавляем новый комментарий к списку с цветом пользователя
@@ -307,7 +308,7 @@ const submitComment = async () => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
 
   &__info {
     &-title {
@@ -318,50 +319,50 @@ const submitComment = async () => {
       width: 100%;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--eos-space-m);
+      gap: var(--eos-spacing-m);
     }
 
     &-item {
       display: flex;
       flex-direction: column;
-      gap: var(--eos-space-xs);
+      gap: var(--eos-spacing-xs);
     }
   }
 
   &__status-controls {
     display: flex;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
     align-items: center;
     flex-wrap: wrap;
   }
 
   &__error {
-    padding: var(--eos-space-m);
+    padding: var(--eos-spacing-m);
     background-color: var(--eos-color-error-light);
     border-radius: var(--eos-radius-m);
-    margin-top: var(--eos-space-m);
+    margin-top: var(--eos-spacing-m);
   }
 
   &__success {
-    padding: var(--eos-space-m);
+    padding: var(--eos-spacing-m);
     background-color: #ecfdf5;
     border-radius: var(--eos-radius-m);
-    margin-top: var(--eos-space-m);
+    margin-top: var(--eos-spacing-m);
   }
 
   &__actions {
     display: flex;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 
   &__empty {
     max-width: 1000px;
     margin: 0 auto;
-    padding: var(--eos-space-2xl) var(--eos-space-m);
+    padding: var(--eos-spacing-2xl) var(--eos-spacing-m);
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-l);
+    gap: var(--eos-spacing-l);
     align-items: center;
   }
 
@@ -373,23 +374,23 @@ const submitComment = async () => {
 .section-content {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   width: 100%;
 }
 
 .status-history {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .history-item {
   background: white;
   border: 1px solid var(--eos-color-primary-200);
   border-radius: var(--eos-radius-m);
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   display: flex;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   align-items: flex-start;
   justify-content: space-between;
 }
@@ -397,14 +398,14 @@ const submitComment = async () => {
 .history-content {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-xs);
+  gap: var(--eos-spacing-xs);
   flex: 1;
 }
 
 .history-meta {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-xs);
+  gap: var(--eos-spacing-xs);
   align-items: flex-end;
   flex-shrink: 0;
 }
@@ -429,23 +430,23 @@ const submitComment = async () => {
 .comments-list {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .comment-item {
   background: white;
   border: 1px solid var(--eos-color-primary-200);
   border-radius: var(--eos-radius-m);
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-s);
+  gap: var(--eos-spacing-s);
 }
 
 .comment-header {
   display: flex;
   align-items: center;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   justify-content: space-between;
   flex-wrap: wrap;
 
@@ -468,7 +469,7 @@ const submitComment = async () => {
 }
 
 .no-comments {
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   text-align: center;
   color: var(--eos-color-primary-600);
   font-size: var(--eos-font-size-m);
@@ -480,7 +481,7 @@ const submitComment = async () => {
 .add-comment {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 
   h3 {
     font-size: var(--eos-font-size-m);
@@ -492,12 +493,12 @@ const submitComment = async () => {
   form {
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 }
 
 .error-message {
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   background-color: var(--eos-color-error-light);
   color: var(--eos-color-error);
   border-radius: var(--eos-radius-m);

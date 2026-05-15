@@ -1,4 +1,5 @@
 <template>
+  <Loader v-if="!user" />
   <div v-if="user" class="user">
     <EosCard class="user__header" align="left" size="m" :style="{ backgroundColor: headerBgColor }">
         <div class="user__avatar">
@@ -33,7 +34,7 @@
       </div>
     </EosCard>
 
-    <EosCard v-if="isAdmin"  size="m" align="left">
+    <EosCard v-if="currentUser.role === 'администратор'"  size="m" align="left">
       <h2 class="user__role-management-title h2">Управление ролью</h2>
       <p class="p1">Текущая роль: {{ user.role || 'Жилец' }}</p>
       <div class="user__actions">
@@ -58,23 +59,18 @@ import { ApiClient } from '~/api/apiClient'
 import { useAuth } from '~/composables/useAuth'
 import { EosButton, EosSelect, EosCard, ButtonVariant } from 'eos-ui-kit'
 import type { components } from '~/api/api'
+import Loader from '~/components/Loader.vue'
 
 type User = components["schemas"]["User"]
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const route = useRoute()
-const { user: authUser } = useAuth()
-const { getUserRole } = useAuth()
 
+const { user: currentUser, loadCurrentUser } = useAuth()
 const user = ref<User | null>(null)
 const loading = ref(true)
 const selectedRole = ref('resident')
 const updatingRole = ref(false)
-
-const isAdmin = computed(() => {
-  const role = getUserRole()
-  return role === 'администратор'
-})
 
 const roleOptions = computed(() => [
   { label: 'жилец', value: 'жилец' },
@@ -123,9 +119,7 @@ const openTelegram = () => {
 onMounted(async () => {
   try {
     const id = Number(route.params.id)
-    console.log('Loading user:', id, 'authUser:', authUser?.value)
     const res = await api.getUserById(id)
-    console.log('User loaded:', res.data)
     user.value = res.data ?? null
     if (user.value) {
       selectedRole.value = user.value.role || 'жилец'
@@ -133,6 +127,8 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+  loadCurrentUser()
+  console.log(currentUser)
 })
 </script>
 
@@ -142,7 +138,7 @@ onMounted(async () => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
 
   &__header {
     display: flex;
@@ -153,7 +149,7 @@ onMounted(async () => {
     &-info {
       display: flex;
       flex-direction: column;
-      gap: var(--eos-space-xs);
+      gap: var(--eos-spacing-xs);
     }
   }
 
@@ -177,12 +173,12 @@ onMounted(async () => {
   &__contacts {
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-s);
+    gap: var(--eos-spacing-s);
   }
 
   &__actions {
     display: flex;
-    gap: var(--eos-space-s); 
+    gap: var(--eos-spacing-s); 
     width: min-content;
   }
 }

@@ -36,7 +36,7 @@ const hasContent = computed(() => {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   width: 100%;
 
   &_with-content {
@@ -48,7 +48,7 @@ const hasContent = computed(() => {
   &__text {
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-xs);
+    gap: var(--eos-spacing-xs);
   }
 
   &__title {
@@ -62,7 +62,8 @@ const hasContent = computed(() => {
   &__content {
     display: flex;
     align-items: center;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 }
 </style>
+

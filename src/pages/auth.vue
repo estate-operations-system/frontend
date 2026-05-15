@@ -27,7 +27,7 @@
             type="submit"
             :loading="isLoading"
           >
-            {{'Отправить код'}}
+            Отправить код
           </EosButton>
         </template>
 
@@ -43,10 +43,14 @@
             type="submit"
             :loading="isLoading"
           >
-            {{ 'Подтвердить' }}
+            Подтвердить
           </EosButton>
         </template>
       </form>
+
+      <p v-if="status" :class="['auth__status', `auth__status--${statusClass}`]">
+        {{ status }}
+      </p>
 
       <p class="auth__footer p1">
         {{ emailMode === 'register' 
@@ -65,8 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref } from 'vue';
 import { useAuth } from '~/composables/useAuth';
 import { EosButton, EosInput, ButtonVariant, InputType, EosCard } from 'eos-ui-kit';
 import PageTitle from '~/components/PageTitle.vue';
@@ -76,11 +79,9 @@ const {
   verifyRegistrationCode,
   sendLoginCode,
   verifyLoginCode,
+  isLoading: globalLoading
 } = useAuth();
 
-const route = useRoute();
-
-const authMethod = ref<'telegram' | 'email' | null>(null);
 const emailMode = ref<'login' | 'register'>('login');
 const step = ref(1);
 const status = ref('');
@@ -93,71 +94,12 @@ const formData = ref({
   code: '',
 });
 
-(window as any).onTelegramAuth = async (user: any) => {
-  console.log('Telegram auth callback received:', user);
-  status.value = 'Отправка данных на сервер...';
-  statusClass.value = 'loading';
-  
-  try {
-    const response = await fetch('https://backend-pl4x.onrender.com/api/auth/telegram', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user),
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ошибка сервера: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('Auth result:', result);
-
-    if (result.token && result.refreshToken) {
-      localStorage.setItem('token', result.token);
-      localStorage.setItem('refreshToken', result.refreshToken);
-      
-      status.value = `Авторизация успешна! Привет, ${user.first_name || 'пользователь'}`;
-      statusClass.value = 'success';
-
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 2000);
-    } else {
-      throw new Error('Не получен токен от сервера');
-    }
-  } catch (error: any) {
-    console.error('Auth error:', error);
-    status.value = `Ошибка: ${error.message}`;
-    statusClass.value = 'error';
-  }
-};
-
 const switchEmailMode = () => {
   emailMode.value = emailMode.value === 'login' ? 'register' : 'login';
   step.value = 1;
   formData.value = { name: '', email: '', code: '' };
   status.value = '';
-};
-
-const handleDirectAuth = async () => {
-  const authData = {
-    id: Number(route.query.id),
-    first_name: route.query.first_name as string || '',
-    last_name: route.query.last_name as string || '',
-    username: route.query.username as string || '',
-    photo_url: route.query.photo_url as string || '',
-    auth_date: Number(route.query.auth_date),
-    hash: route.query.hash as string,
-  };
-  
-  console.log('Direct auth data:', authData);
-  
-  if (authData.id && authData.hash) {
-    await (window as any).onTelegramAuth(authData);
-  }
+  statusClass.value = '';
 };
 
 const handleSendCode = async () => {
@@ -170,7 +112,6 @@ const handleSendCode = async () => {
       if (!formData.value.name || !formData.value.email) {
         status.value = 'Заполните имя и email';
         statusClass.value = 'error';
-        isLoading.value = false;
         return;
       }
       await sendRegistrationCode(formData.value.email, formData.value.name);
@@ -178,7 +119,6 @@ const handleSendCode = async () => {
       if (!formData.value.email) {
         status.value = 'Введите email';
         statusClass.value = 'error';
-        isLoading.value = false;
         return;
       }
       await sendLoginCode(formData.value.email);
@@ -194,7 +134,6 @@ const handleSendCode = async () => {
     isLoading.value = false;
   }
 };
-
 
 const handleVerifyCode = async () => {
   if (!formData.value.code) {
@@ -218,10 +157,12 @@ const handleVerifyCode = async () => {
       await verifyLoginCode(formData.value.email, formData.value.code);
     }
     
-    status.value = 'Авторизация успешна!';
+    status.value = 'Авторизация успешна! Перенаправление...';
     statusClass.value = 'success';
 
-    window.location.href = '/';
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
   } catch (error: any) {
     status.value = error.message || 'Ошибка верификации';
     statusClass.value = 'error';
@@ -229,42 +170,43 @@ const handleVerifyCode = async () => {
     isLoading.value = false;
   }
 };
-
-onMounted(() => {
-  console.log('Auth page mounted');
-  
-  if (route.query.id && route.query.hash) {
-    authMethod.value = 'telegram';
-    handleDirectAuth();
-  } else {
-    // Проверяем sessionStorage на сохраненный режим email авторизации
-    const savedEmailMode = sessionStorage.getItem('authEmailMode') as 'login' | 'register' | null;
-    if (savedEmailMode) {
-      authMethod.value = 'email';
-      emailMode.value = savedEmailMode;
-      sessionStorage.removeItem('authEmailMode');
-    }
-  }
-});
-
 </script>
 
 <style scoped lang="scss">
 .auth {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
   align-items: center;
 
   &__form {
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 
   &__footer {
     text-align: center;
-    color: var(--eos-color-primary-900)
+    color: var(--eos-color-primary-900);
+    margin-top: var(--eos-spacing-m);
+  }
+
+  &__status {
+    margin-top: var(--eos-spacing-m);
+    padding: var(--eos-spacing-s);
+    border-radius: var(--eos-radius-m);
+    text-align: center;
+    font-size: var(--eos-font-size-m);
+
+    &--success {
+      color: var(--eos-color-success-700);
+      background-color: var(--eos-color-success-100);
+    }
+
+    &--error {
+      color: var(--eos-color-danger-700);
+      background-color: var(--eos-color-danger-100);
+    }
   }
 }
 </style>

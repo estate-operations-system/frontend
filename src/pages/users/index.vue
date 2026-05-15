@@ -1,5 +1,6 @@
 <template>
-  <div class="users">
+  <Loader v-if="isLoading" />
+  <div v-else class="users">
     <PageTitle 
       :title="'Пользователи'"
       :subtitle="'Управление жильцами и их профилями'"
@@ -22,9 +23,9 @@ type User = components["schemas"]["User"]
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const router = useRouter()
+const isLoading = ref(true);
 
 const users = ref<User[]>([])
-const loading = ref(true)
 const error = ref<string | null>(null)
 
 const tableColumns = computed<TableColumn[]>(() => [
@@ -55,7 +56,7 @@ onMounted(async () => {
   } catch (e: any) {
     error.value = e.message || 'Ошибка загрузки'
   } finally {
-    loading.value = false
+    isLoading.value = false
   }
 })
 </script>
@@ -64,7 +65,7 @@ onMounted(async () => {
 .users {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
   align-items: center;
 }
 </style>

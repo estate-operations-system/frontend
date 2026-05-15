@@ -52,3 +52,4 @@ declare module 'eos-ui-kit' {
 
   export const EosButton: DefineComponent<ButtonProps>
 }
+
