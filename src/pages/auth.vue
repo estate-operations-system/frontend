@@ -1,12 +1,15 @@
 <template>
   <div class="auth">
-    <PageTitle 
+    <PageTitle
       :title="emailMode === 'register' ? 'Регистрация' : 'Вход'"
       :subtitle="emailMode === 'register' ? 'Создайте новый аккаунт' : 'Войдите в свой аккаунт'"
     />
 
     <EosCard>
-      <form @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()" class="auth__form">
+      <form
+        class="auth__form"
+        @submit.prevent="step === 1 ? handleSendCode() : handleVerifyCode()"
+      >
         <template v-if="step === 1">
           <EosInput
             v-if="emailMode === 'register'"
@@ -23,7 +26,7 @@
             :disabled="isLoading"
           />
 
-          <EosButton 
+          <EosButton
             type="submit"
             :loading="isLoading"
           >
@@ -39,7 +42,7 @@
             :disabled="isLoading"
           />
 
-          <EosButton 
+          <EosButton
             type="submit"
             :loading="isLoading"
           >
@@ -48,20 +51,20 @@
         </template>
       </form>
 
-      <p v-if="status" :class="['auth__status', `auth__status--${statusClass}`]">
+      <p
+        v-if="status"
+        :class="['auth__status', `auth__status--${statusClass}`]"
+      >
         {{ status }}
       </p>
 
       <p class="auth__footer p1">
-        {{ emailMode === 'register' 
-          ? 'Уже есть аккаунт?' 
-          : 'Нет аккаунта?' }}
-        <EosButton :variant="ButtonVariant.Tertiary" @click="switchEmailMode">
-          {{
-            emailMode === 'register'
-            ? 'Войти'
-            : 'Зарегистрироваться'
-          }}
+        {{ emailMode === 'register' ? 'Уже есть аккаунт?' : 'Нет аккаунта?' }}
+        <EosButton
+          :variant="ButtonVariant.Tertiary"
+          @click="switchEmailMode"
+        >
+          {{ emailMode === 'register' ? 'Войти' : 'Зарегистрироваться' }}
         </EosButton>
       </p>
     </EosCard>
@@ -69,107 +72,97 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useAuth } from '~/composables/useAuth';
-import { EosButton, EosInput, ButtonVariant, InputType, EosCard } from 'eos-ui-kit';
-import PageTitle from '~/components/PageTitle.vue';
+import { ref } from 'vue'
+import { useAuth } from '~/composables/useAuth'
+import { EosButton, EosInput, ButtonVariant, InputType, EosCard } from 'eos-ui-kit'
+import PageTitle from '~/components/PageTitle.vue'
 
-const { 
-  sendRegistrationCode, 
-  verifyRegistrationCode,
-  sendLoginCode,
-  verifyLoginCode,
-  isLoading: globalLoading
-} = useAuth();
+const { sendRegistrationCode, verifyRegistrationCode, sendLoginCode, verifyLoginCode } = useAuth()
 
-const emailMode = ref<'login' | 'register'>('login');
-const step = ref(1);
-const status = ref('');
-const statusClass = ref('');
-const isLoading = ref(false);
+const emailMode = ref<'login' | 'register'>('login')
+const step = ref(1)
+const status = ref('')
+const statusClass = ref('')
+const isLoading = ref(false)
 
 const formData = ref({
   name: '',
   email: '',
-  code: '',
-});
+  code: ''
+})
 
 const switchEmailMode = () => {
-  emailMode.value = emailMode.value === 'login' ? 'register' : 'login';
-  step.value = 1;
-  formData.value = { name: '', email: '', code: '' };
-  status.value = '';
-  statusClass.value = '';
-};
+  emailMode.value = emailMode.value === 'login' ? 'register' : 'login'
+  step.value = 1
+  formData.value = { name: '', email: '', code: '' }
+  status.value = ''
+  statusClass.value = ''
+}
 
 const handleSendCode = async () => {
-  isLoading.value = true;
-  status.value = '';
-  statusClass.value = '';
+  isLoading.value = true
+  status.value = ''
+  statusClass.value = ''
 
   try {
     if (emailMode.value === 'register') {
       if (!formData.value.name || !formData.value.email) {
-        status.value = 'Заполните имя и email';
-        statusClass.value = 'error';
-        return;
+        status.value = 'Заполните имя и email'
+        statusClass.value = 'error'
+        return
       }
-      await sendRegistrationCode(formData.value.email, formData.value.name);
+      await sendRegistrationCode(formData.value.email, formData.value.name)
     } else {
       if (!formData.value.email) {
-        status.value = 'Введите email';
-        statusClass.value = 'error';
-        return;
+        status.value = 'Введите email'
+        statusClass.value = 'error'
+        return
       }
-      await sendLoginCode(formData.value.email);
+      await sendLoginCode(formData.value.email)
     }
 
-    status.value = 'Код отправлен на ваш email';
-    statusClass.value = 'success';
-    step.value = 2;
+    status.value = 'Код отправлен на ваш email'
+    statusClass.value = 'success'
+    step.value = 2
   } catch (error: any) {
-    status.value = error.message || 'Ошибка отправки кода';
-    statusClass.value = 'error';
+    status.value = error.message || 'Ошибка отправки кода'
+    statusClass.value = 'error'
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 const handleVerifyCode = async () => {
   if (!formData.value.code) {
-    status.value = 'Введите код подтверждения';
-    statusClass.value = 'error';
-    return;
+    status.value = 'Введите код подтверждения'
+    statusClass.value = 'error'
+    return
   }
 
-  isLoading.value = true;
-  status.value = '';
-  statusClass.value = '';
+  isLoading.value = true
+  status.value = ''
+  statusClass.value = ''
 
   try {
     if (emailMode.value === 'register') {
-      await verifyRegistrationCode(
-        formData.value.email,
-        formData.value.code,
-        formData.value.name
-      );
+      await verifyRegistrationCode(formData.value.email, formData.value.code, formData.value.name)
     } else {
-      await verifyLoginCode(formData.value.email, formData.value.code);
+      await verifyLoginCode(formData.value.email, formData.value.code)
     }
-    
-    status.value = 'Авторизация успешна! Перенаправление...';
-    statusClass.value = 'success';
+
+    status.value = 'Авторизация успешна! Перенаправление...'
+    statusClass.value = 'success'
 
     setTimeout(() => {
-      window.location.href = '/';
-    }, 1500);
+      window.location.href = '/'
+    }, 1500)
   } catch (error: any) {
-    status.value = error.message || 'Ошибка верификации';
-    statusClass.value = 'error';
+    status.value = error.message || 'Ошибка верификации'
+    statusClass.value = 'error'
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 </script>
 
 <style scoped lang="scss">

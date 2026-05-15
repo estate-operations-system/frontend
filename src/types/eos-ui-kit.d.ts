@@ -27,13 +27,13 @@ declare module 'eos-ui-kit' {
   export enum ButtonSize {
     Small = 'small',
     Medium = 'medium',
-    Large = 'large',
+    Large = 'large'
   }
 
   export enum ButtonVariant {
     Primary = 'primary',
     Secondary = 'secondary',
-    Tertiary = 'tertiary',
+    Tertiary = 'tertiary'
   }
 
   export interface ButtonProps {
@@ -52,4 +52,3 @@ declare module 'eos-ui-kit' {
 
   export const EosButton: DefineComponent<ButtonProps>
 }
-

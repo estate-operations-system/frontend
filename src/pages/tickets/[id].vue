@@ -1,12 +1,19 @@
 <template>
-  <Loader v-if="isLoading"/>
-  <div v-else-if="ticket" class="ticket">
-    <PageTitle 
+  <Loader v-if="isLoading" />
+  <div
+    v-else-if="ticket"
+    class="ticket"
+  >
+    <PageTitle
       :title="'Заявка #' + ticket.id"
       :subtitle="ticket.category"
     />
 
-    <EosCard class="ticket__info" align="left" size="m">
+    <EosCard
+      class="ticket__info"
+      align="left"
+      size="m"
+    >
       <h2 class="ticket__info-title h2">Основная информация</h2>
       <div class="ticket__info-grid">
         <div class="ticket__info-item">
@@ -19,7 +26,11 @@
         </div>
         <div class="ticket__info-item">
           <span class="p2">ID жильца</span>
-          <EosButton :variant="ButtonVariant.Tertiary" :to="`/users/${ticket.resident_id}`" class="ticket__link">
+          <EosButton
+            :variant="ButtonVariant.Tertiary"
+            :to="`/users/${ticket.resident_id}`"
+            class="ticket__link"
+          >
             {{ ticket.resident_id }}
           </EosButton>
         </div>
@@ -30,18 +41,29 @@
       </div>
     </EosCard>
 
-    <EosCard v-if="ticket.description" align="left" size="m">
+    <EosCard
+      v-if="ticket.description"
+      align="left"
+      size="m"
+    >
       <h2 class="h2">Описание</h2>
       <p class="p1">{{ ticket.description }}</p>
     </EosCard>
 
-    <EosCard v-if="isAdmin || ticket.comments" align="left" size="m">
-      <EosTabs 
+    <EosCard
+      v-if="isAdmin || ticket.comments"
+      align="left"
+      size="m"
+    >
+      <EosTabs
         v-model="activeTab"
         :tabs="tabItems"
       />
 
-      <div v-show="activeTab === 'comments'" class="section-content">
+      <div
+        v-show="activeTab === 'comments'"
+        class="section-content"
+      >
         <div class="add-comment">
           <form @submit.prevent="submitComment">
             <EosInput
@@ -50,17 +72,25 @@
               placeholder="Введите ваш комментарий..."
               :disabled="submittingComment"
             />
-            <EosButton 
-              type="submit" 
+            <EosButton
+              type="submit"
               :disabled="submittingComment || !newComment"
             >
               {{ submittingComment ? 'Отправка...' : 'Отправить' }}
             </EosButton>
           </form>
-          <div v-if="commentError" class="error-message">{{ commentError }}</div>
+          <div
+            v-if="commentError"
+            class="error-message"
+          >
+            {{ commentError }}
+          </div>
         </div>
-        
-        <div v-if="ticket.comments && ticket.comments.length > 0" class="comments-list">
+
+        <div
+          v-if="ticket.comments && ticket.comments.length > 0"
+          class="comments-list"
+        >
           <div
             v-for="comment in [...ticket.comments].reverse()"
             :key="comment.id"
@@ -74,28 +104,53 @@
             <div class="comment-text">{{ comment.comment }}</div>
           </div>
         </div>
-        <div v-else class="no-comments">Комментариев пока нет</div>
+        <div
+          v-else
+          class="no-comments"
+        >
+          Комментариев пока нет
+        </div>
       </div>
 
       <!-- Таб Управление статусом -->
-      <div v-if="isAdmin" v-show="activeTab === 'status'" class="section-content">
+      <div
+        v-if="isAdmin"
+        v-show="activeTab === 'status'"
+        class="section-content"
+      >
         <p class="p1">Текущий статус: {{ ticket.status || '-' }}</p>
-        
+
         <div class="ticket__status-controls">
-          <EosSelect 
+          <EosSelect
             v-model="selectedStatus"
             :options="statusOptions"
             placeholder="Выберите статус"
           />
-          <EosButton @click="updateTicketStatus" :disabled="updatingStatus">
+          <EosButton
+            :disabled="updatingStatus"
+            @click="updateTicketStatus"
+          >
             {{ updatingStatus ? 'Сохранение...' : 'Сохранить' }}
           </EosButton>
         </div>
-        
-        <div v-if="statusError" class="ticket__error p2 text-error">{{ statusError }}</div>
-        <div v-if="statusSuccess" class="ticket__success p2 text-success">Статус успешно обновлен</div>
 
-        <div v-if="ticket.statusHistory" class="status-history">
+        <div
+          v-if="statusError"
+          class="ticket__error p2 text-error"
+        >
+          {{ statusError }}
+        </div>
+        <div
+          v-if="statusSuccess"
+          class="ticket__success p2 text-success"
+        >
+          Статус успешно обновлен
+        </div>
+
+        <div
+          v-if="ticket.statusHistory"
+          class="status-history"
+        >
           <h3 class="h3">История изменений статуса</h3>
           <div class="status-history">
             <div
@@ -105,9 +160,16 @@
             >
               <div class="history-content">
                 <span class="status-change">
-                  {{ history.old_status ? `${history.old_status} → ${history.new_status}` : `Создано со статусом ${history.new_status}` }}
+                  {{
+                    history.old_status
+                      ? `${history.old_status} → ${history.new_status}`
+                      : `Создано со статусом ${history.new_status}`
+                  }}
                 </span>
-                <span v-if="history.changed_by_name" class="changed-by">
+                <span
+                  v-if="history.changed_by_name"
+                  class="changed-by"
+                >
                   ({{ history.changed_by_name }})
                 </span>
               </div>
@@ -127,7 +189,10 @@
     </div>
   </div>
 
-  <div v-else-if="!ticket" class="ticket__empty">
+  <div
+    v-else-if="!ticket"
+    class="ticket__empty"
+  >
     <p class="p1 text-secondary">Заявка не найдена</p>
     <NuxtLink to="/tickets">
       <EosButton variant="secondary">Вернуться к списку</EosButton>
@@ -140,11 +205,19 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import { useAuth } from '~/composables/useAuth'
-import { EosButton, EosSelect, EosInput, InputType, EosTabs, EosCard, ButtonVariant } from 'eos-ui-kit'
+import {
+  EosButton,
+  EosSelect,
+  EosInput,
+  InputType,
+  EosTabs,
+  EosCard,
+  ButtonVariant
+} from 'eos-ui-kit'
 import type { SelectOption, TabItem } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
-type Ticket = components["schemas"]["Ticket"]
+type Ticket = components['schemas']['Ticket']
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const route = useRoute()
@@ -166,9 +239,7 @@ const statusOptions: SelectOption[] = [
 const activeTab = ref<'comments' | 'status'>('comments')
 
 const tabItems = computed<TabItem[]>(() => {
-  const items: TabItem[] = [
-    { label: 'Комментарии', value: 'comments' }
-  ]
+  const items: TabItem[] = [{ label: 'Комментарии', value: 'comments' }]
   if (isAdmin.value) {
     items.push({ label: 'Управление статусом', value: 'status' })
   }
@@ -222,11 +293,11 @@ const loadTicket = async () => {
 
 const updateTicketStatus = async () => {
   if (!ticket.value) return
-  
+
   updatingStatus.value = true
   statusError.value = null
   statusSuccess.value = false
-  
+
   try {
     await api.updateTicketStatus(ticket.value.id, { status: selectedStatus.value })
     await loadTicket()
@@ -263,11 +334,11 @@ onMounted(async () => {
 const adjustColor = (color: string) => {
   const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/)
   if (!match) return color
-  
+
   const hue = match[1]
   const saturation = Math.max(parseInt(match[2]) - 40, 20)
   const lightness = Math.min(parseInt(match[3]) + 40, 95)
-  
+
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`
 }
 
@@ -333,7 +404,7 @@ onUnmounted(() => {
 
   &__info {
     &-title {
-      color: var(--eos-color-primary-800)
+      color: var(--eos-color-primary-800);
     }
 
     &-grid {

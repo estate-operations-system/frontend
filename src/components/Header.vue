@@ -1,23 +1,39 @@
 <template>
-    <div class="header">
-      <NuxtLink to="/" class="header__title">Estate Operations</NuxtLink>
-      <div v-if="isLoggedIn" class="header__links">
-        <NuxtLink to="/users" class="header__link">Пользователи</NuxtLink>
-        <NuxtLink to="/tickets" class="header__link">Заявки</NuxtLink>
-      </div>
-      <NuxtLink to="/profile" class="header__profile-button">
-        <EosAccountIcon/>
-      </NuxtLink>
+  <div class="header">
+    <NuxtLink
+      to="/"
+      class="header__title"
+      >Estate Operations</NuxtLink
+    >
+    <div
+      v-if="isLoggedIn"
+      class="header__links"
+    >
+      <NuxtLink
+        to="/users"
+        class="header__link"
+        >Пользователи</NuxtLink
+      >
+      <NuxtLink
+        to="/tickets"
+        class="header__link"
+        >Заявки</NuxtLink
+      >
     </div>
+    <NuxtLink
+      to="/profile"
+      class="header__profile-button"
+    >
+      <EosAccountIcon />
+    </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { useAuth } from "~/composables/useAuth";
-import { EosAccountIcon } from "eos-ui-kit";
+import { useAuth } from '~/composables/useAuth'
+import { EosAccountIcon } from 'eos-ui-kit'
 
-const router = useRouter();
-const { isLoggedIn } = useAuth();
+const { isLoggedIn } = useAuth()
 </script>
 
 <style lang="scss" scoped>
@@ -86,4 +102,3 @@ const { isLoggedIn } = useAuth();
   }
 }
 </style>
-

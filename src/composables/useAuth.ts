@@ -3,17 +3,7 @@ import { useRouter } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import type { components } from '~/api/api'
 
-type User = components["schemas"]["User"]
-
-interface TelegramAuthData {
-  id: number
-  first_name: string
-  last_name?: string
-  username?: string
-  photo_url?: string
-  auth_date: number
-  hash: string
-}
+type User = components['schemas']['User']
 
 interface AuthResponse {
   success: boolean
@@ -98,7 +88,7 @@ export const useAuth = () => {
     if (!data) return data
     return {
       ...data,
-      phoneNumber: data.phoneNumber || data.phone_number,
+      phoneNumber: data.phoneNumber || data.phone_number
     }
   }
 
@@ -120,7 +110,7 @@ export const useAuth = () => {
       const token = getToken()
       if (!token) return
 
-      const response = await apiClient.getUserById('me' as any) as any
+      const response = (await apiClient.getUserById('me' as any)) as any
       if (response?.data) {
         user.value = formatUserData(response.data)
         if (response.data.role) {
@@ -135,12 +125,12 @@ export const useAuth = () => {
     name: string
   ): Promise<{ success: boolean; message: string }> => {
     return withLoading(async () => {
-      const response = await apiClient.sendRegistrationCode(email, name) as any
+      const response = (await apiClient.sendRegistrationCode(email, name)) as any
 
       if (response?.success) {
         return {
           success: true,
-          message: response.message || 'Код отправлен на ваш email',
+          message: response.message || 'Код отправлен на ваш email'
         }
       } else {
         throw new Error(response?.error || 'Failed to send registration code')
@@ -148,16 +138,14 @@ export const useAuth = () => {
     })
   }
 
-  const sendLoginCode = async (
-    email: string
-  ): Promise<{ success: boolean; message: string }> => {
+  const sendLoginCode = async (email: string): Promise<{ success: boolean; message: string }> => {
     return withLoading(async () => {
-      const response = await apiClient.sendLoginCode(email) as any
+      const response = (await apiClient.sendLoginCode(email)) as any
 
       if (response?.success) {
         return {
           success: true,
-          message: response.message || 'Код отправлен на ваш email',
+          message: response.message || 'Код отправлен на ваш email'
         }
       } else {
         throw new Error(response?.error || 'Failed to send login code')
@@ -171,7 +159,7 @@ export const useAuth = () => {
     name: string
   ): Promise<AuthResponse> => {
     return withLoading(async () => {
-      const response = await apiClient.verifyRegistrationCode(email, code, name) as any
+      const response = (await apiClient.verifyRegistrationCode(email, code, name)) as any
 
       if (response?.success && response?.token && response?.refreshToken) {
         setToken(response.token, response.refreshToken)
@@ -184,7 +172,7 @@ export const useAuth = () => {
           success: true,
           token: response.token,
           refreshToken: response.refreshToken,
-          user: userData,
+          user: userData
         }
       } else {
         throw new Error(response?.error || 'Registration verification failed')
@@ -192,12 +180,9 @@ export const useAuth = () => {
     })
   }
 
-  const verifyLoginCode = async (
-    email: string,
-    code: string
-  ): Promise<AuthResponse> => {
+  const verifyLoginCode = async (email: string, code: string): Promise<AuthResponse> => {
     return withLoading(async () => {
-      const response = await apiClient.verifyLoginCode(email, code) as any
+      const response = (await apiClient.verifyLoginCode(email, code)) as any
 
       if (response?.success && response?.token && response?.refreshToken) {
         setToken(response.token, response.refreshToken)
@@ -210,7 +195,7 @@ export const useAuth = () => {
           success: true,
           token: response.token,
           refreshToken: response.refreshToken,
-          user: userData,
+          user: userData
         }
       } else {
         throw new Error(response?.error || 'Login verification failed')

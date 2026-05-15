@@ -1,6 +1,10 @@
 <template>
-  <div id="app" class="app" :class="{ 'app__home': isHomePage }">
-    <Header class="header"/>
+  <div
+    id="app"
+    class="app"
+    :class="{ app__home: isHomePage }"
+  >
+    <Header class="header" />
 
     <main class="app__content">
       <NuxtPage />
@@ -9,21 +13,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useAuth } from "~/composables/useAuth";
-import Header from "~/components/Header.vue";
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '~/composables/useAuth'
+import Header from '~/components/Header.vue'
 
-const router = useRouter();
-const { isLoggedIn, loadCurrentUser } = useAuth();
+const router = useRouter()
+const { isLoggedIn, loadCurrentUser } = useAuth()
 
-const isHomePage = computed(() => router.currentRoute.value.path === '/');
+const isHomePage = computed(() => router.currentRoute.value.path === '/')
 
 onMounted(async () => {
   if (isLoggedIn.value) {
     await loadCurrentUser()
   }
-});
+})
 </script>
 
 <style lang="scss">
@@ -55,4 +59,3 @@ html {
   }
 }
 </style>
-

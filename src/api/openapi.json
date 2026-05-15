@@ -41,14 +41,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Новая",
-              "Назначена",
-              "Выполняется",
-              "На проверке",
-              "Закрыта",
-              "Отменена"
-            ]
+            "enum": ["Новая", "Назначена", "Выполняется", "На проверке", "Закрыта", "Отменена"]
           },
           "resident_id": {
             "type": "integer"
@@ -58,13 +51,7 @@
             "format": "date-time"
           }
         },
-        "required": [
-          "id",
-          "category",
-          "address",
-          "status",
-          "resident_id"
-        ]
+        "required": ["id", "category", "address", "status", "resident_id"]
       },
       "TicketCreate": {
         "type": "object",
@@ -80,25 +67,13 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Новая",
-              "Назначена",
-              "Выполняется",
-              "На проверке",
-              "Закрыта",
-              "Отменена"
-            ]
+            "enum": ["Новая", "Назначена", "Выполняется", "На проверке", "Закрыта", "Отменена"]
           },
           "resident_id": {
             "type": "integer"
           }
         },
-        "required": [
-          "category",
-          "address",
-          "status",
-          "resident_id"
-        ]
+        "required": ["category", "address", "status", "resident_id"]
       },
       "TicketUpdate": {
         "type": "object",
@@ -114,14 +89,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "Новая",
-              "Назначена",
-              "Выполняется",
-              "На проверке",
-              "Закрыта",
-              "Отменена"
-            ]
+            "enum": ["Новая", "Назначена", "Выполняется", "На проверке", "Закрыта", "Отменена"]
           }
         }
       },
@@ -152,11 +120,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "жилец",
-              "администратор",
-              "юрист"
-            ],
+            "enum": ["жилец", "администратор", "юрист"],
             "nullable": true
           },
           "color": {
@@ -176,11 +140,7 @@
             "format": "date-time"
           }
         },
-        "required": [
-          "id",
-          "name",
-          "role"
-        ]
+        "required": ["id", "name", "role"]
       },
       "UserCreate": {
         "type": "object",
@@ -202,11 +162,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "жилец",
-              "администратор",
-              "юрист"
-            ]
+            "enum": ["жилец", "администратор", "юрист"]
           },
           "color": {
             "type": "string"
@@ -218,10 +174,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "telegram_id"
-        ]
+        "required": ["name", "telegram_id"]
       },
       "UserUpdate": {
         "type": "object",
@@ -237,11 +190,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "жилец",
-              "администратор",
-              "юрист"
-            ]
+            "enum": ["жилец", "администратор", "юрист"]
           },
           "color": {
             "type": "string"
@@ -293,12 +242,7 @@
             "format": "date-time"
           }
         },
-        "required": [
-          "id",
-          "user_id",
-          "license_plate",
-          "parking_spot"
-        ]
+        "required": ["id", "user_id", "license_plate", "parking_spot"]
       },
       "VehicleParkingCreate": {
         "type": "object",
@@ -328,11 +272,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "user_id",
-          "license_plate",
-          "parking_spot"
-        ]
+        "required": ["user_id", "license_plate", "parking_spot"]
       },
       "VehicleParkingUpdate": {
         "type": "object",
@@ -374,9 +314,7 @@
     "/api/auth/telegram": {
       "get": {
         "summary": "Проверка Telegram авторизации через query-параметры",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "parameters": [
           {
             "in": "query",
@@ -436,9 +374,7 @@
       },
       "post": {
         "summary": "Проверка Telegram авторизации через POST тело запроса",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -468,11 +404,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "id",
-                  "auth_date",
-                  "hash"
-                ]
+                "required": ["id", "auth_date", "hash"]
               }
             }
           }
@@ -490,9 +422,7 @@
     "/api/auth/status": {
       "get": {
         "summary": "Проверить статус авторизации по JWT",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [
           {
             "bearerAuth": []
@@ -514,9 +444,7 @@
     "/api/auth/logout": {
       "post": {
         "summary": "Выйти из системы",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "responses": {
           "200": {
             "description": "Успешный выход"
@@ -527,9 +455,7 @@
     "/api/auth/register": {
       "post": {
         "summary": "Зарегистрировать нового пользователя",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -550,10 +476,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "telegram_id"
-                ]
+                "required": ["name", "telegram_id"]
               }
             }
           }
@@ -571,9 +494,7 @@
     "/api/auth/login": {
       "post": {
         "summary": "Войти с помощью telegram_id и пароля",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -588,10 +509,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "telegram_id",
-                  "password"
-                ]
+                "required": ["telegram_id", "password"]
               }
             }
           }
@@ -615,9 +533,7 @@
     "/api/auth/refresh": {
       "post": {
         "summary": "Обновить access token используя refresh token",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -630,9 +546,7 @@
                     "description": "Refresh token полученный при логине"
                   }
                 },
-                "required": [
-                  "refreshToken"
-                ]
+                "required": ["refreshToken"]
               }
             }
           }
@@ -671,9 +585,7 @@
     "/api/auth/send-registration-code": {
       "post": {
         "summary": "Отправить код подтверждения для регистрации через email (без Telegram)",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -691,10 +603,7 @@
                     "description": "Имя пользователя"
                   }
                 },
-                "required": [
-                  "email",
-                  "name"
-                ]
+                "required": ["email", "name"]
               }
             }
           }
@@ -715,9 +624,7 @@
     "/api/auth/verify-registration-code": {
       "post": {
         "summary": "Проверить код подтверждения и выполнить регистрацию через email",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -738,11 +645,7 @@
                     "description": "Имя пользователя"
                   }
                 },
-                "required": [
-                  "email",
-                  "code",
-                  "name"
-                ]
+                "required": ["email", "code", "name"]
               }
             }
           }
@@ -763,9 +666,7 @@
     "/api/auth/send-login-code": {
       "post": {
         "summary": "Отправить код подтверждения для авторизации через email",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -779,9 +680,7 @@
                     "description": "Email адрес пользователя"
                   }
                 },
-                "required": [
-                  "email"
-                ]
+                "required": ["email"]
               }
             }
           }
@@ -799,9 +698,7 @@
     "/api/auth/verify-login-code": {
       "post": {
         "summary": "Проверить код подтверждения и выполнить авторизацию через email",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -818,10 +715,7 @@
                     "description": "6-значный код подтверждения"
                   }
                 },
-                "required": [
-                  "email",
-                  "code"
-                ]
+                "required": ["email", "code"]
               }
             }
           }
@@ -842,9 +736,7 @@
     "/api/tickets": {
       "post": {
         "summary": "Создать новую заявку",
-        "tags": [
-          "Tickets"
-        ],
+        "tags": ["Tickets"],
         "requestBody": {
           "required": true,
           "content": {
@@ -869,9 +761,7 @@
       },
       "get": {
         "summary": "Получить список всех заявок",
-        "tags": [
-          "Tickets"
-        ],
+        "tags": ["Tickets"],
         "responses": {
           "200": {
             "description": "Список заявок"
@@ -885,9 +775,7 @@
     "/api/tickets/{id}": {
       "get": {
         "summary": "Получить заявку по ID",
-        "tags": [
-          "Tickets"
-        ],
+        "tags": ["Tickets"],
         "parameters": [
           {
             "in": "path",
@@ -912,9 +800,7 @@
       },
       "put": {
         "summary": "Обновить заявку",
-        "tags": [
-          "Tickets"
-        ],
+        "tags": ["Tickets"],
         "parameters": [
           {
             "in": "path",
@@ -949,9 +835,7 @@
       },
       "delete": {
         "summary": "Удалить заявку",
-        "tags": [
-          "Tickets"
-        ],
+        "tags": ["Tickets"],
         "parameters": [
           {
             "in": "path",
@@ -978,9 +862,7 @@
     "/api/tickets/{id}/status": {
       "patch": {
         "summary": "Обновить статус заявки (только для администраторов)",
-        "tags": [
-          "Tickets"
-        ],
+        "tags": ["Tickets"],
         "parameters": [
           {
             "in": "path",
@@ -1000,11 +882,7 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": [
-                      "Новая",
-                      "В работе",
-                      "Выполнена"
-                    ]
+                    "enum": ["Новая", "В работе", "Выполнена"]
                   }
                 }
               }
@@ -1030,9 +908,7 @@
     "/api/tickets/{id}/comments": {
       "post": {
         "summary": "Добавить комментарий к заявке",
-        "tags": [
-          "Tickets"
-        ],
+        "tags": ["Tickets"],
         "parameters": [
           {
             "in": "path",
@@ -1080,9 +956,7 @@
     "/api/users": {
       "post": {
         "summary": "Создать нового пользователя",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "requestBody": {
           "required": true,
           "content": {
@@ -1107,9 +981,7 @@
       },
       "get": {
         "summary": "Получить список всех пользователей",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "responses": {
           "200": {
             "description": "Список пользователей"
@@ -1123,9 +995,7 @@
     "/api/users/{id}": {
       "get": {
         "summary": "Получить пользователя по ID",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -1150,9 +1020,7 @@
       },
       "put": {
         "summary": "Обновить пользователя",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -1187,9 +1055,7 @@
       },
       "delete": {
         "summary": "Удалить пользователя",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -1216,9 +1082,7 @@
     "/api/users/telegram/{telegramId}": {
       "get": {
         "summary": "Получить пользователя по Telegram ID",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -1245,9 +1109,7 @@
     "/api/users/{id}/role": {
       "patch": {
         "summary": "Обновить роль пользователя (только для администраторов)",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -1267,11 +1129,7 @@
                 "properties": {
                   "role": {
                     "type": "string",
-                    "enum": [
-                      "жилец",
-                      "администратор",
-                      "юрист"
-                    ]
+                    "enum": ["жилец", "администратор", "юрист"]
                   }
                 }
               }
@@ -1297,9 +1155,7 @@
     "/api/vehicle-parking": {
       "post": {
         "summary": "Создать запись транспортного средства / парковки",
-        "tags": [
-          "VehicleParking"
-        ],
+        "tags": ["VehicleParking"],
         "requestBody": {
           "required": true,
           "content": {
@@ -1324,9 +1180,7 @@
       },
       "get": {
         "summary": "Получить все записи по транспортным средствам и парковкам",
-        "tags": [
-          "VehicleParking"
-        ],
+        "tags": ["VehicleParking"],
         "responses": {
           "200": {
             "description": "Список записей"
@@ -1340,9 +1194,7 @@
     "/api/vehicle-parking/{id}": {
       "get": {
         "summary": "Получить запись по ID",
-        "tags": [
-          "VehicleParking"
-        ],
+        "tags": ["VehicleParking"],
         "parameters": [
           {
             "in": "path",
@@ -1367,9 +1219,7 @@
       },
       "put": {
         "summary": "Обновить запись транспортного средства/парковки",
-        "tags": [
-          "VehicleParking"
-        ],
+        "tags": ["VehicleParking"],
         "parameters": [
           {
             "in": "path",
@@ -1404,9 +1254,7 @@
       },
       "delete": {
         "summary": "Удалить запись транспортного средства/парковки",
-        "tags": [
-          "VehicleParking"
-        ],
+        "tags": ["VehicleParking"],
         "parameters": [
           {
             "in": "path",
@@ -1433,9 +1281,7 @@
     "/api/vehicle-parking/user/{userId}": {
       "get": {
         "summary": "Получить записи по user_id",
-        "tags": [
-          "VehicleParking"
-        ],
+        "tags": ["VehicleParking"],
         "parameters": [
           {
             "in": "path",

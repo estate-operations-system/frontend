@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { EosLoader } from "eos-ui-kit";
+import { EosLoader } from 'eos-ui-kit'
 </script>
 
 <style lang="scss" scoped>

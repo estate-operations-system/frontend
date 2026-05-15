@@ -1,7 +1,16 @@
 <template>
-  <EosCard :size="size" :align="align" class="home-card__card">
+  <EosCard
+    :size="size"
+    :align="align"
+    class="home-card__card"
+  >
     <div class="home-card__header">
-      <div v-if="number" class="home-card__number h2">{{ number }}</div>
+      <div
+        v-if="number"
+        class="home-card__number h2"
+      >
+        {{ number }}
+      </div>
       <h3 class="home-card__title h2">{{ title }}</h3>
     </div>
     <p class="home-card__description p1">{{ description }}</p>
@@ -10,18 +19,18 @@
 </template>
 
 <script setup lang="ts">
-import { EosButton, EosCard } from "eos-ui-kit";
+import { EosButton, EosCard } from 'eos-ui-kit'
 interface Props {
-  number?: number;
-  title: string;
-  description: string;
-  to: string;
-  buttonText: string;
-  align?: "left" | "center";
-  size?: "s" | "m" | "l";
+  number?: number
+  title: string
+  description: string
+  to: string
+  buttonText: string
+  align?: 'left' | 'center'
+  size?: 's' | 'm' | 'l'
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>
 
 <style lang="scss" scoped>
@@ -29,8 +38,8 @@ defineProps<Props>();
   &__card {
     min-width: unset;
   }
-  
- &__header {
+
+  &__header {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -58,4 +67,3 @@ defineProps<Props>();
   }
 }
 </style>
-

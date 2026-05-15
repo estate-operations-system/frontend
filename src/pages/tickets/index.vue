@@ -1,21 +1,36 @@
 <template>
   <Loader v-if="isLoading" />
-  <div v-else class="tickets">
-    <PageTitle 
+  <div
+    v-else
+    class="tickets"
+  >
+    <PageTitle
       title="Заявки"
       subtitle="Управление заявками и их статусами"
     >
       <EosButton @click="openCreateModal">Создать заявку</EosButton>
     </PageTitle>
 
-    <div v-if="isCreateModalOpen" class="modal-overlay" @click.self="closeCreateModal">
+    <div
+      v-if="isCreateModalOpen"
+      class="modal-overlay"
+      @click.self="closeCreateModal"
+    >
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title h3">Создать заявку</h2>
-          <EosButton size="small" variant="secondary" @click="closeCreateModal">Закрыть</EosButton>
+          <EosButton
+            size="small"
+            variant="secondary"
+            @click="closeCreateModal"
+            >Закрыть</EosButton
+          >
         </div>
 
-        <form class="create-form" @submit.prevent="submitTicket">
+        <form
+          class="create-form"
+          @submit.prevent="submitTicket"
+        >
           <EosInput
             v-model="form.category"
             placeholder="Категория"
@@ -35,10 +50,18 @@
             required
           />
 
-          <div v-if="createError" class="error-message">{{ createError }}</div>
+          <div
+            v-if="createError"
+            class="error-message"
+          >
+            {{ createError }}
+          </div>
 
           <div class="actions">
-            <EosButton type="submit" :disabled="creating">
+            <EosButton
+              type="submit"
+              :disabled="creating"
+            >
               {{ creating ? 'Создание...' : 'Создать заявку' }}
             </EosButton>
           </div>
@@ -46,7 +69,12 @@
       </div>
     </div>
 
-    <EosTable :columns="tableColumns" :rows="tableRows" clickable @rowClick="handleRowClick" />
+    <EosTable
+      :columns="tableColumns"
+      :rows="tableRows"
+      clickable
+      @row-click="handleRowClick"
+    />
   </div>
 </template>
 
@@ -60,7 +88,7 @@ import type { TableColumn, TableRow } from 'eos-ui-kit'
 import { useAuth } from '~/composables/useAuth'
 import PageTitle from '~/components/PageTitle.vue'
 
-type Ticket = components["schemas"]["Ticket"]
+type Ticket = components['schemas']['Ticket']
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const router = useRouter()
@@ -70,7 +98,7 @@ const tickets = ref<Ticket[]>([])
 const isCreateModalOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | null>(null)
-const isLoading = ref(true);
+const isLoading = ref(true)
 const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null)
 
 const form = ref({
@@ -90,7 +118,7 @@ const tableColumns = computed<TableColumn[]>(() => [
 ])
 
 const tableRows = computed<TableRow[]>(() =>
-  tickets.value.map(ticket => ({
+  tickets.value.map((ticket) => ({
     id: String(ticket.id),
     cells: [
       { id: 'id', data: String(ticket.id) },
@@ -149,7 +177,7 @@ const submitTicket = async () => {
   createError.value = null
 
   const resident_id = form.value.resident_id || user.id
-  
+
   if (!form.value.category || !form.value.address || !form.value.description || !resident_id) {
     console.warn('Validation failed:', {
       category: form.value.category,
@@ -293,4 +321,3 @@ onUnmounted(() => {
   justify-content: flex-end;
 }
 </style>
-
