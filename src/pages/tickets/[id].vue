@@ -148,15 +148,15 @@ type Ticket = components["schemas"]["Ticket"]
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const route = useRoute()
-const { user: authUser } = useAuth()
+const { user: authUser, loadCurrentUser } = useAuth()
 
 const ticket = ref<Ticket | null>(null)
 const selectedStatus = ref('open')
 const updatingStatus = ref(false)
 const statusError = ref<string | null>(null)
 const statusSuccess = ref(false)
-const hasUnreadUpdates = ref(false)
 const isLoading = ref(true)
+const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null)
 
 const statusOptions: SelectOption[] = [
   { label: 'В работе', value: 'В работе' },
@@ -197,6 +197,29 @@ const formatDate = (date: string | undefined) => {
   })
 }
 
+const loadTicket = async () => {
+  const id = Number(route.params.id)
+  const res = await api.getTicketById(id)
+
+  ticket.value = res.data ?? null
+
+  if (!ticket.value) return
+
+  selectedStatus.value = ticket.value.status || 'open'
+
+  if (ticket.value.comments) {
+    for (const comment of ticket.value.comments) {
+      if (comment.user_id && comment.user_color) {
+        usersColorMap.value.set(comment.user_id, comment.user_color)
+      }
+    }
+  }
+
+  if (authUser.value?.color) {
+    usersColorMap.value.set(authUser.value.id, authUser.value.color)
+  }
+}
+
 const updateTicketStatus = async () => {
   if (!ticket.value) return
   
@@ -206,7 +229,7 @@ const updateTicketStatus = async () => {
   
   try {
     await api.updateTicketStatus(ticket.value.id, { status: selectedStatus.value })
-    ticket.value.status = selectedStatus.value
+    await loadTicket()
     statusSuccess.value = true
     setTimeout(() => {
       statusSuccess.value = false
@@ -220,24 +243,16 @@ const updateTicketStatus = async () => {
 
 onMounted(async () => {
   try {
-    const id = Number(route.params.id)
-    const res = await api.getTicketById(id)
-    ticket.value = res.data ?? null
-    if (ticket.value) {
-      selectedStatus.value = ticket.value.status || 'open'
-      // Заполняем карту цветов пользователей из комментариев
-      if (ticket.value.comments) {
-        for (const comment of ticket.value.comments) {
-          if (comment.user_id && comment.user_color) {
-            usersColorMap.value.set(comment.user_id, comment.user_color)
-          }
-        }
+    await loadCurrentUser()
+    await loadTicket()
+
+    refreshInterval.value = setInterval(async () => {
+      try {
+        await loadTicket()
+      } catch (e) {
+        console.error('Polling error:', e)
       }
-      // Добавляем текущего пользователя если это его комментарий
-      if (authUser.value && authUser.value.color) {
-        usersColorMap.value.set(authUser.value.id, authUser.value.color)
-      }
-    }
+    }, 5000)
   } catch (e: any) {
     console.error('Error loading ticket:', e)
   } finally {
@@ -300,6 +315,12 @@ const submitComment = async () => {
     submittingComment.value = false
   }
 }
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

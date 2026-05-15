@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import type { components } from '~/api/api'
@@ -71,6 +71,7 @@ const isCreateModalOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | null>(null)
 const isLoading = ref(true);
+const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null)
 
 const form = ref({
   category: '',
@@ -113,14 +114,20 @@ const formatDate = (date: string | undefined) => {
   })
 }
 
-const fetchTickets = async () => {
+const fetchTickets = async (showLoader = false) => {
   try {
+    if (showLoader) {
+      isLoading.value = true
+    }
+
     const res = await api.getTickets()
     tickets.value = res.data ?? []
   } catch (e: any) {
     createError.value = e.message || 'Ошибка загрузки'
   } finally {
-    isLoading.value = false
+    if (showLoader) {
+      isLoading.value = false
+    }
   }
 }
 
@@ -185,7 +192,23 @@ const submitTicket = async () => {
 
 onMounted(async () => {
   await loadCurrentUser()
-  await fetchTickets()
+  await fetchTickets(true)
+
+  refreshInterval.value = setInterval(async () => {
+    if (document.hidden) return
+
+    try {
+      await fetchTickets()
+    } catch (e) {
+      console.error('Polling error:', e)
+    }
+  }, 5000)
+})
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+  }
 })
 </script>
 
