@@ -1,20 +1,36 @@
 <template>
-  <div class="tickets">
-    <PageTitle 
+  <Loader v-if="isLoading" />
+  <div
+    v-else
+    class="tickets"
+  >
+    <PageTitle
       title="Заявки"
       subtitle="Управление заявками и их статусами"
     >
       <EosButton @click="openCreateModal">Создать заявку</EosButton>
     </PageTitle>
 
-    <div v-if="isCreateModalOpen" class="modal-overlay" @click.self="closeCreateModal">
+    <div
+      v-if="isCreateModalOpen"
+      class="modal-overlay"
+      @click.self="closeCreateModal"
+    >
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title h3">Создать заявку</h2>
-          <EosButton size="small" variant="secondary" @click="closeCreateModal">Закрыть</EosButton>
+          <EosButton
+            size="small"
+            variant="secondary"
+            @click="closeCreateModal"
+            >Закрыть</EosButton
+          >
         </div>
 
-        <form class="create-form" @submit.prevent="submitTicket">
+        <form
+          class="create-form"
+          @submit.prevent="submitTicket"
+        >
           <EosInput
             v-model="form.category"
             placeholder="Категория"
@@ -34,10 +50,18 @@
             required
           />
 
-          <div v-if="createError" class="error-message">{{ createError }}</div>
+          <div
+            v-if="createError"
+            class="error-message"
+          >
+            {{ createError }}
+          </div>
 
           <div class="actions">
-            <EosButton type="submit" :disabled="creating">
+            <EosButton
+              type="submit"
+              :disabled="creating"
+            >
               {{ creating ? 'Создание...' : 'Создать заявку' }}
             </EosButton>
           </div>
@@ -45,12 +69,17 @@
       </div>
     </div>
 
-    <EosTable :columns="tableColumns" :rows="tableRows" clickable @rowClick="handleRowClick" />
+    <EosTable
+      :columns="tableColumns"
+      :rows="tableRows"
+      clickable
+      @row-click="handleRowClick"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import type { components } from '~/api/api'
@@ -59,16 +88,18 @@ import type { TableColumn, TableRow } from 'eos-ui-kit'
 import { useAuth } from '~/composables/useAuth'
 import PageTitle from '~/components/PageTitle.vue'
 
-type Ticket = components["schemas"]["Ticket"]
+type Ticket = components['schemas']['Ticket']
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const router = useRouter()
-const { getUserRole, user, loadCurrentUser } = useAuth()
+const { user, loadCurrentUser } = useAuth()
 
 const tickets = ref<Ticket[]>([])
 const isCreateModalOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | null>(null)
+const isLoading = ref(true)
+const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null)
 
 const form = ref({
   category: '',
@@ -87,7 +118,7 @@ const tableColumns = computed<TableColumn[]>(() => [
 ])
 
 const tableRows = computed<TableRow[]>(() =>
-  tickets.value.map(ticket => ({
+  tickets.value.map((ticket) => ({
     id: String(ticket.id),
     cells: [
       { id: 'id', data: String(ticket.id) },
@@ -111,12 +142,20 @@ const formatDate = (date: string | undefined) => {
   })
 }
 
-const fetchTickets = async () => {
+const fetchTickets = async (showLoader = false) => {
   try {
+    if (showLoader) {
+      isLoading.value = true
+    }
+
     const res = await api.getTickets()
     tickets.value = res.data ?? []
   } catch (e: any) {
     createError.value = e.message || 'Ошибка загрузки'
+  } finally {
+    if (showLoader) {
+      isLoading.value = false
+    }
   }
 }
 
@@ -126,7 +165,6 @@ const handleRowClick = (row: TableRow) => {
 
 const openCreateModal = () => {
   createError.value = null
-  console.log('openCreateModal - user:', user.value)
   form.value.resident_id = user.value?.id
   isCreateModalOpen.value = true
 }
@@ -139,7 +177,7 @@ const submitTicket = async () => {
   createError.value = null
 
   const resident_id = form.value.resident_id || user.id
-  
+
   if (!form.value.category || !form.value.address || !form.value.description || !resident_id) {
     console.warn('Validation failed:', {
       category: form.value.category,
@@ -182,7 +220,23 @@ const submitTicket = async () => {
 
 onMounted(async () => {
   await loadCurrentUser()
-  await fetchTickets()
+  await fetchTickets(true)
+
+  refreshInterval.value = setInterval(async () => {
+    if (document.hidden) return
+
+    try {
+      await fetchTickets()
+    } catch (e) {
+      console.error('Polling error:', e)
+    }
+  }, 5000)
+})
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+  }
 })
 </script>
 
@@ -190,13 +244,13 @@ onMounted(async () => {
 .tickets {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
   align-items: center;
 
   &__actions {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: var(--eos-space-l);
+    margin-bottom: var(--eos-spacing-l);
   }
 }
 
@@ -208,7 +262,7 @@ onMounted(async () => {
   justify-content: center;
   background: rgba(0, 0, 0, 0.4);
   z-index: 50;
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
 }
 
 .modal {
@@ -219,17 +273,17 @@ onMounted(async () => {
   border-radius: var(--eos-radius-l);
   border: 1px solid var(--eos-color-primary-200);
   background: white;
-  padding: var(--eos-space-l);
+  padding: var(--eos-spacing-l);
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .modal-title {
@@ -240,12 +294,12 @@ onMounted(async () => {
 
 .create-form {
   display: grid;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .field {
   display: grid;
-  gap: var(--eos-space-xs);
+  gap: var(--eos-spacing-xs);
 }
 
 .field label {
@@ -255,7 +309,7 @@ onMounted(async () => {
 }
 
 .error-message {
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   background-color: var(--eos-color-error-light);
   color: var(--eos-color-error);
   border-radius: var(--eos-radius-m);

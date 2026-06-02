@@ -72,7 +72,7 @@ export class ApiClient {
 
   private getAuthHeaders(): Record<string, string> {
     const token = localStorage.getItem(this.tokenKey)
-    return token ? { 'Authorization': `Bearer ${token}` } : {}
+    return token ? { Authorization: `Bearer ${token}` } : {}
   }
 
   private async refreshTokens(): Promise<{ token: string; refreshToken: string } | null> {
@@ -92,9 +92,9 @@ export class ApiClient {
         const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
           method: 'POST',
           headers: {
-            'Content-Type': this.contentType,
+            'Content-Type': this.contentType
           },
-          body: JSON.stringify({ refreshToken }),
+          body: JSON.stringify({ refreshToken })
         })
 
         if (!response.ok) {
@@ -126,19 +126,17 @@ export class ApiClient {
     return this.refreshPromise
   }
 
-  private async _request<T>(
-    url: string,
-    options: RequestOptions = {}
-  ): Promise<T> {
+  private async _request<T>(url: string, options: RequestOptions = {}): Promise<T> {
     const { retries = this.maxRetries, ...fetchOptions } = options
 
     const finalOptions: RequestInit = {
       headers: {
-        [this.contentType === 'application/json' ? 'Content-Type' : 'content-type']: this.contentType,
+        [this.contentType === 'application/json' ? 'Content-Type' : 'content-type']:
+          this.contentType,
         ...this.getAuthHeaders(),
-        ...fetchOptions.headers,
+        ...fetchOptions.headers
       },
-      ...fetchOptions,
+      ...fetchOptions
     }
 
     try {
@@ -150,11 +148,12 @@ export class ApiClient {
         if (refreshed) {
           const retryOptions: RequestInit = {
             headers: {
-              [this.contentType === 'application/json' ? 'Content-Type' : 'content-type']: this.contentType,
+              [this.contentType === 'application/json' ? 'Content-Type' : 'content-type']:
+                this.contentType,
               ...this.getAuthHeaders(),
-              ...fetchOptions.headers,
+              ...fetchOptions.headers
             },
-            ...fetchOptions,
+            ...fetchOptions
           }
 
           const retryResponse = await fetch(url, retryOptions)
@@ -191,67 +190,60 @@ export class ApiClient {
   private isRetryableError(error: unknown): boolean {
     if (!(error instanceof Error)) return false
     const retryableMessages = ['Failed to fetch', 'Network request failed', 'timeout']
-    return retryableMessages.some(msg => error.message.includes(msg))
+    return retryableMessages.some((msg) => error.message.includes(msg))
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
   async getUsers() {
-    return this._request<paths['/api/users']['get']['responses'][200]['content']['application/json']>(
-      `${this.baseUrl}/api/users`
-    )
+    return this._request<
+      paths['/api/users']['get']['responses'][200]['content']['application/json']
+    >(`${this.baseUrl}/api/users`)
   }
 
   async getUserById(id: number) {
-    return this._request<paths['/api/users/{id}']['get']['responses'][200]['content']['application/json']>(
-      `${this.baseUrl}/api/users/${id}`
-    )
+    return this._request<
+      paths['/api/users/{id}']['get']['responses'][200]['content']['application/json']
+    >(`${this.baseUrl}/api/users/${id}`)
   }
 
-  async createUser(
-    payload: components['schemas']['UserCreate']
-  ) {
-    return this._request<paths['/api/users']['post']['responses'][200]['content']['application/json']>(
-      `${this.baseUrl}/api/users`,
-      {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      }
-    )
+  async createUser(payload: components['schemas']['UserCreate']) {
+    return this._request<
+      paths['/api/users']['post']['responses'][200]['content']['application/json']
+    >(`${this.baseUrl}/api/users`, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
   }
 
-  async updateUser(
-    id: number,
-    payload: components['schemas']['UserUpdate']
-  ) {
-    return this._request<paths['/api/users/{id}']['put']['responses'][200]['content']['application/json']>(
-      `${this.baseUrl}/api/users/${id}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      }
-    )
+  async updateUser(id: number, payload: components['schemas']['UserUpdate']) {
+    return this._request<
+      paths['/api/users/{id}']['put']['responses'][200]['content']['application/json']
+    >(`${this.baseUrl}/api/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    })
   }
 
   async updateUserRole(id: number, payload: { role: string }) {
     return this._request(`${this.baseUrl}/api/users/${id}/role`, {
       method: 'PATCH',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payload)
     })
   }
 
   async updateTicketStatus(id: number, payload: { status: string }) {
     return this._request(`${this.baseUrl}/api/tickets/${id}/status`, {
       method: 'PATCH',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payload)
     })
   }
 
   async deleteUser(id: number) {
     return this._request(`${this.baseUrl}/api/users/${id}`, {
-      method: 'DELETE',
+      method: 'DELETE'
     })
   }
 
@@ -260,33 +252,29 @@ export class ApiClient {
   }
 
   async getTickets() {
-    return this._request<paths['/api/tickets']['get']['responses'][200]['content']['application/json']>(
-      `${this.baseUrl}/api/tickets`
-    )
+    return this._request<
+      paths['/api/tickets']['get']['responses'][200]['content']['application/json']
+    >(`${this.baseUrl}/api/tickets`)
   }
 
   async getTicketById(id: number) {
-    return this._request<paths['/api/tickets/{id}']['get']['responses'][200]['content']['application/json']>(
-      `${this.baseUrl}/api/tickets/${id}`
-    )
+    return this._request<
+      paths['/api/tickets/{id}']['get']['responses'][200]['content']['application/json']
+    >(`${this.baseUrl}/api/tickets/${id}`)
   }
 
-  async updateTicket(
-    id: number,
-    payload: components['schemas']['TicketUpdate']
-  ) {
-    return this._request<paths['/api/tickets/{id}']['put']['responses'][200]['content']['application/json']>(
-      `${this.baseUrl}/api/tickets/${id}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      }
-    )
+  async updateTicket(id: number, payload: components['schemas']['TicketUpdate']) {
+    return this._request<
+      paths['/api/tickets/{id}']['put']['responses'][200]['content']['application/json']
+    >(`${this.baseUrl}/api/tickets/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    })
   }
 
   async deleteTicket(id: number) {
     return this._request(`${this.baseUrl}/api/tickets/${id}`, {
-      method: 'DELETE',
+      method: 'DELETE'
     })
   }
 
@@ -307,7 +295,7 @@ export class ApiClient {
       `${this.baseUrl}/api/vehicle-parking`,
       {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       }
     )
   }
@@ -317,14 +305,14 @@ export class ApiClient {
       `${this.baseUrl}/api/vehicle-parking/${id}`,
       {
         method: 'PUT',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       }
     )
   }
 
   async deleteVehicleParking(id: number) {
     return this._request(`${this.baseUrl}/api/vehicle-parking/${id}`, {
-      method: 'DELETE',
+      method: 'DELETE'
     })
   }
 
@@ -332,7 +320,7 @@ export class ApiClient {
     return this._request(`${this.baseUrl}/api/auth/telegram`, {
       method: 'POST',
       credentials: 'include',
-      body: JSON.stringify(telegramData),
+      body: JSON.stringify(telegramData)
     })
   }
 
@@ -341,8 +329,8 @@ export class ApiClient {
       method: 'POST',
       body: JSON.stringify({
         email,
-        name,
-      }),
+        name
+      })
     })
   }
 
@@ -352,8 +340,8 @@ export class ApiClient {
       body: JSON.stringify({
         email,
         code,
-        name,
-      }),
+        name
+      })
     })
   }
 
@@ -361,8 +349,8 @@ export class ApiClient {
     return this._request(`${this.baseUrl}/api/auth/send-login-code`, {
       method: 'POST',
       body: JSON.stringify({
-        email,
-      }),
+        email
+      })
     })
   }
 
@@ -371,8 +359,8 @@ export class ApiClient {
       method: 'POST',
       body: JSON.stringify({
         email,
-        code,
-      }),
+        code
+      })
     })
   }
 
@@ -381,12 +369,14 @@ export class ApiClient {
       `${this.baseUrl}/api/auth/refresh`,
       {
         method: 'POST',
-        body: JSON.stringify({ refreshToken }),
+        body: JSON.stringify({ refreshToken })
       }
     )
   }
 
-  async createTicket(payload: paths['/api/tickets']['post']['requestBody']['content']['application/json']) {
+  async createTicket(
+    payload: paths['/api/tickets']['post']['requestBody']['content']['application/json']
+  ) {
     const requestPayload = {
       ...payload,
       status: 'open'
@@ -408,14 +398,15 @@ export class ApiClient {
       throw new Error(errorMessage)
     }
 
-    const data: paths['/api/tickets']['post']['responses'][201]['content']['application/json'] = json
+    const data: paths['/api/tickets']['post']['responses'][201]['content']['application/json'] =
+      json
     return data
   }
 
   async addTicketComment(id: number, payload: { comment: string }) {
     return this._request(`${this.baseUrl}/api/tickets/${id}/comments`, {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payload)
     })
   }
 }

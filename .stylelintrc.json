@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-prettier"
+  ],
+  "ignoreFiles": [
+    "**/*.vue",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "rules": {
+    "selector-class-pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?(__[a-z]([a-z0-9-]*[a-z0-9])?)?(_[a-z]([a-z0-9-]*[a-z0-9])?)*$",
+    "scss/no-global-function-names": null,
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "use"
+        ]
+      }
+    ]
+  }
+}

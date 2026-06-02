@@ -5,9 +5,17 @@
   >
     <div class="page-title__text">
       <h1 class="page-title__title h1">{{ title }}</h1>
-      <h2 v-if="subtitle" class="page-title__subtitle h2">{{ subtitle }}</h2>
+      <h2
+        v-if="subtitle"
+        class="page-title__subtitle h2"
+      >
+        {{ subtitle }}
+      </h2>
     </div>
-    <div v-if="$slots.default" class="page-title__content">
+    <div
+      v-if="$slots.default"
+      class="page-title__content"
+    >
       <slot />
     </div>
   </div>
@@ -36,7 +44,7 @@ const hasContent = computed(() => {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   width: 100%;
 
   &_with-content {
@@ -48,7 +56,7 @@ const hasContent = computed(() => {
   &__text {
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-xs);
+    gap: var(--eos-spacing-xs);
   }
 
   &__title {
@@ -62,7 +70,7 @@ const hasContent = computed(() => {
   &__content {
     display: flex;
     align-items: center;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 }
 </style>

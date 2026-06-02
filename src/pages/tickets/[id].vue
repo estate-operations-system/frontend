@@ -1,11 +1,19 @@
 <template>
-  <div v-if="ticket" class="ticket">
-    <PageTitle 
+  <Loader v-if="isLoading" />
+  <div
+    v-else-if="ticket"
+    class="ticket"
+  >
+    <PageTitle
       :title="'Заявка #' + ticket.id"
       :subtitle="ticket.category"
     />
 
-    <EosCard class="ticket__info" align="left" size="m">
+    <EosCard
+      class="ticket__info"
+      align="left"
+      size="m"
+    >
       <h2 class="ticket__info-title h2">Основная информация</h2>
       <div class="ticket__info-grid">
         <div class="ticket__info-item">
@@ -18,7 +26,11 @@
         </div>
         <div class="ticket__info-item">
           <span class="p2">ID жильца</span>
-          <EosButton :variant="ButtonVariant.Tertiary" :to="`/users/${ticket.resident_id}`" class="ticket__link">
+          <EosButton
+            :variant="ButtonVariant.Tertiary"
+            :to="`/users/${ticket.resident_id}`"
+            class="ticket__link"
+          >
             {{ ticket.resident_id }}
           </EosButton>
         </div>
@@ -29,18 +41,29 @@
       </div>
     </EosCard>
 
-    <EosCard v-if="ticket.description" align="left" size="m">
+    <EosCard
+      v-if="ticket.description"
+      align="left"
+      size="m"
+    >
       <h2 class="h2">Описание</h2>
       <p class="p1">{{ ticket.description }}</p>
     </EosCard>
 
-    <EosCard v-if="isAdmin || ticket.comments" align="left" size="m">
-      <EosTabs 
+    <EosCard
+      v-if="isAdmin || ticket.comments"
+      align="left"
+      size="m"
+    >
+      <EosTabs
         v-model="activeTab"
         :tabs="tabItems"
       />
 
-      <div v-show="activeTab === 'comments'" class="section-content">
+      <div
+        v-show="activeTab === 'comments'"
+        class="section-content"
+      >
         <div class="add-comment">
           <form @submit.prevent="submitComment">
             <EosInput
@@ -49,17 +72,25 @@
               placeholder="Введите ваш комментарий..."
               :disabled="submittingComment"
             />
-            <EosButton 
-              type="submit" 
+            <EosButton
+              type="submit"
               :disabled="submittingComment || !newComment"
             >
               {{ submittingComment ? 'Отправка...' : 'Отправить' }}
             </EosButton>
           </form>
-          <div v-if="commentError" class="error-message">{{ commentError }}</div>
+          <div
+            v-if="commentError"
+            class="error-message"
+          >
+            {{ commentError }}
+          </div>
         </div>
-        
-        <div v-if="ticket.comments && ticket.comments.length > 0" class="comments-list">
+
+        <div
+          v-if="ticket.comments && ticket.comments.length > 0"
+          class="comments-list"
+        >
           <div
             v-for="comment in [...ticket.comments].reverse()"
             :key="comment.id"
@@ -73,28 +104,53 @@
             <div class="comment-text">{{ comment.comment }}</div>
           </div>
         </div>
-        <div v-else class="no-comments">Комментариев пока нет</div>
+        <div
+          v-else
+          class="no-comments"
+        >
+          Комментариев пока нет
+        </div>
       </div>
 
       <!-- Таб Управление статусом -->
-      <div v-if="isAdmin" v-show="activeTab === 'status'" class="section-content">
+      <div
+        v-if="isAdmin"
+        v-show="activeTab === 'status'"
+        class="section-content"
+      >
         <p class="p1">Текущий статус: {{ ticket.status || '-' }}</p>
-        
+
         <div class="ticket__status-controls">
-          <EosSelect 
+          <EosSelect
             v-model="selectedStatus"
             :options="statusOptions"
             placeholder="Выберите статус"
           />
-          <EosButton @click="updateTicketStatus" :disabled="updatingStatus">
+          <EosButton
+            :disabled="updatingStatus"
+            @click="updateTicketStatus"
+          >
             {{ updatingStatus ? 'Сохранение...' : 'Сохранить' }}
           </EosButton>
         </div>
-        
-        <div v-if="statusError" class="ticket__error p2 text-error">{{ statusError }}</div>
-        <div v-if="statusSuccess" class="ticket__success p2 text-success">Статус успешно обновлен</div>
 
-        <div v-if="ticket.statusHistory" class="status-history">
+        <div
+          v-if="statusError"
+          class="ticket__error p2 text-error"
+        >
+          {{ statusError }}
+        </div>
+        <div
+          v-if="statusSuccess"
+          class="ticket__success p2 text-success"
+        >
+          Статус успешно обновлен
+        </div>
+
+        <div
+          v-if="ticket.statusHistory"
+          class="status-history"
+        >
           <h3 class="h3">История изменений статуса</h3>
           <div class="status-history">
             <div
@@ -104,9 +160,16 @@
             >
               <div class="history-content">
                 <span class="status-change">
-                  {{ history.old_status ? `${history.old_status} → ${history.new_status}` : `Создано со статусом ${history.new_status}` }}
+                  {{
+                    history.old_status
+                      ? `${history.old_status} → ${history.new_status}`
+                      : `Создано со статусом ${history.new_status}`
+                  }}
                 </span>
-                <span v-if="history.changed_by_name" class="changed-by">
+                <span
+                  v-if="history.changed_by_name"
+                  class="changed-by"
+                >
                   ({{ history.changed_by_name }})
                 </span>
               </div>
@@ -126,7 +189,10 @@
     </div>
   </div>
 
-  <div v-else class="ticket__empty">
+  <div
+    v-else-if="!ticket"
+    class="ticket__empty"
+  >
     <p class="p1 text-secondary">Заявка не найдена</p>
     <NuxtLink to="/tickets">
       <EosButton variant="secondary">Вернуться к списку</EosButton>
@@ -135,25 +201,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import { useAuth } from '~/composables/useAuth'
-import { EosButton, EosSelect, EosInput, InputType, EosTabs, EosCard, ButtonVariant } from 'eos-ui-kit'
+import {
+  EosButton,
+  EosSelect,
+  EosInput,
+  InputType,
+  EosTabs,
+  EosCard,
+  ButtonVariant
+} from 'eos-ui-kit'
 import type { SelectOption, TabItem } from 'eos-ui-kit'
 import type { components } from '~/api/api'
 
-type Ticket = components["schemas"]["Ticket"]
+type Ticket = components['schemas']['Ticket']
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const route = useRoute()
-const { getUserRole, user: authUser } = useAuth()
+const { user: authUser, loadCurrentUser } = useAuth()
 
 const ticket = ref<Ticket | null>(null)
 const selectedStatus = ref('open')
 const updatingStatus = ref(false)
 const statusError = ref<string | null>(null)
 const statusSuccess = ref(false)
+const isLoading = ref(true)
+const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null)
 
 const statusOptions: SelectOption[] = [
   { label: 'В работе', value: 'В работе' },
@@ -163,9 +239,7 @@ const statusOptions: SelectOption[] = [
 const activeTab = ref<'comments' | 'status'>('comments')
 
 const tabItems = computed<TabItem[]>(() => {
-  const items: TabItem[] = [
-    { label: 'Комментарии', value: 'comments' }
-  ]
+  const items: TabItem[] = [{ label: 'Комментарии', value: 'comments' }]
   if (isAdmin.value) {
     items.push({ label: 'Управление статусом', value: 'status' })
   }
@@ -179,7 +253,7 @@ const submittingComment = ref(false)
 const commentError = ref('')
 
 const isAdmin = computed(() => {
-  const role = getUserRole()
+  const role = authUser.value?.role
   return role === 'администратор'
 })
 
@@ -194,16 +268,39 @@ const formatDate = (date: string | undefined) => {
   })
 }
 
+const loadTicket = async () => {
+  const id = Number(route.params.id)
+  const res = await api.getTicketById(id)
+
+  ticket.value = res.data ?? null
+
+  if (!ticket.value) return
+
+  selectedStatus.value = ticket.value.status || 'open'
+
+  if (ticket.value.comments) {
+    for (const comment of ticket.value.comments) {
+      if (comment.user_id && comment.user_color) {
+        usersColorMap.value.set(comment.user_id, comment.user_color)
+      }
+    }
+  }
+
+  if (authUser.value?.color) {
+    usersColorMap.value.set(authUser.value.id, authUser.value.color)
+  }
+}
+
 const updateTicketStatus = async () => {
   if (!ticket.value) return
-  
+
   updatingStatus.value = true
   statusError.value = null
   statusSuccess.value = false
-  
+
   try {
     await api.updateTicketStatus(ticket.value.id, { status: selectedStatus.value })
-    ticket.value.status = selectedStatus.value
+    await loadTicket()
     statusSuccess.value = true
     setTimeout(() => {
       statusSuccess.value = false
@@ -217,37 +314,31 @@ const updateTicketStatus = async () => {
 
 onMounted(async () => {
   try {
-    const id = Number(route.params.id)
-    const res = await api.getTicketById(id)
-    ticket.value = res.data ?? null
-    if (ticket.value) {
-      selectedStatus.value = ticket.value.status || 'open'
-      // Заполняем карту цветов пользователей из комментариев
-      if (ticket.value.comments) {
-        for (const comment of ticket.value.comments) {
-          if (comment.user_id && comment.user_color) {
-            usersColorMap.value.set(comment.user_id, comment.user_color)
-          }
-        }
+    await loadCurrentUser()
+    await loadTicket()
+
+    refreshInterval.value = setInterval(async () => {
+      try {
+        await loadTicket()
+      } catch (e) {
+        console.error('Polling error:', e)
       }
-      // Добавляем текущего пользователя если это его комментарий
-      if (authUser.value && authUser.value.color) {
-        usersColorMap.value.set(authUser.value.id, authUser.value.color)
-      }
-    }
+    }, 5000)
   } catch (e: any) {
     console.error('Error loading ticket:', e)
+  } finally {
+    isLoading.value = false
   }
 })
 
 const adjustColor = (color: string) => {
   const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/)
   if (!match) return color
-  
+
   const hue = match[1]
   const saturation = Math.max(parseInt(match[2]) - 40, 20)
   const lightness = Math.min(parseInt(match[3]) + 40, 95)
-  
+
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`
 }
 
@@ -271,13 +362,9 @@ const submitComment = async () => {
     submittingComment.value = true
     commentError.value = ''
 
-    console.log('newComment', newComment.value)
-
     const response = await api.addTicketComment(ticket.value!.id, {
       comment: newComment.value
     })
-    
-    console.log('response', response);
 
     if (response?.success) {
       // Добавляем новый комментарий к списку с цветом пользователя
@@ -299,6 +386,12 @@ const submitComment = async () => {
     submittingComment.value = false
   }
 }
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -307,61 +400,61 @@ const submitComment = async () => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
 
   &__info {
     &-title {
-      color: var(--eos-color-primary-800)
+      color: var(--eos-color-primary-800);
     }
 
     &-grid {
       width: 100%;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--eos-space-m);
+      gap: var(--eos-spacing-m);
     }
 
     &-item {
       display: flex;
       flex-direction: column;
-      gap: var(--eos-space-xs);
+      gap: var(--eos-spacing-xs);
     }
   }
 
   &__status-controls {
     display: flex;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
     align-items: center;
     flex-wrap: wrap;
   }
 
   &__error {
-    padding: var(--eos-space-m);
+    padding: var(--eos-spacing-m);
     background-color: var(--eos-color-error-light);
     border-radius: var(--eos-radius-m);
-    margin-top: var(--eos-space-m);
+    margin-top: var(--eos-spacing-m);
   }
 
   &__success {
-    padding: var(--eos-space-m);
+    padding: var(--eos-spacing-m);
     background-color: #ecfdf5;
     border-radius: var(--eos-radius-m);
-    margin-top: var(--eos-space-m);
+    margin-top: var(--eos-spacing-m);
   }
 
   &__actions {
     display: flex;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 
   &__empty {
     max-width: 1000px;
     margin: 0 auto;
-    padding: var(--eos-space-2xl) var(--eos-space-m);
+    padding: var(--eos-spacing-2xl) var(--eos-spacing-m);
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-l);
+    gap: var(--eos-spacing-l);
     align-items: center;
   }
 
@@ -373,23 +466,23 @@ const submitComment = async () => {
 .section-content {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   width: 100%;
 }
 
 .status-history {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .history-item {
   background: white;
   border: 1px solid var(--eos-color-primary-200);
   border-radius: var(--eos-radius-m);
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   display: flex;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   align-items: flex-start;
   justify-content: space-between;
 }
@@ -397,14 +490,14 @@ const submitComment = async () => {
 .history-content {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-xs);
+  gap: var(--eos-spacing-xs);
   flex: 1;
 }
 
 .history-meta {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-xs);
+  gap: var(--eos-spacing-xs);
   align-items: flex-end;
   flex-shrink: 0;
 }
@@ -429,23 +522,23 @@ const submitComment = async () => {
 .comments-list {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 }
 
 .comment-item {
   background: white;
   border: 1px solid var(--eos-color-primary-200);
   border-radius: var(--eos-radius-m);
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-s);
+  gap: var(--eos-spacing-s);
 }
 
 .comment-header {
   display: flex;
   align-items: center;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
   justify-content: space-between;
   flex-wrap: wrap;
 
@@ -468,7 +561,7 @@ const submitComment = async () => {
 }
 
 .no-comments {
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   text-align: center;
   color: var(--eos-color-primary-600);
   font-size: var(--eos-font-size-m);
@@ -480,7 +573,7 @@ const submitComment = async () => {
 .add-comment {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-m);
+  gap: var(--eos-spacing-m);
 
   h3 {
     font-size: var(--eos-font-size-m);
@@ -492,12 +585,12 @@ const submitComment = async () => {
   form {
     display: flex;
     flex-direction: column;
-    gap: var(--eos-space-m);
+    gap: var(--eos-spacing-m);
   }
 }
 
 .error-message {
-  padding: var(--eos-space-m);
+  padding: var(--eos-spacing-m);
   background-color: var(--eos-color-error-light);
   color: var(--eos-color-error);
   border-radius: var(--eos-radius-m);

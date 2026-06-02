@@ -1,0 +1,16 @@
+node_modules
+dist
+build
+coverage
+*.log
+.env
+.env.local
+.env.*.local
+.nuxt
+.output
+storybook-static
+test-results
+visual-test-report
+pnpm-lock.yaml
+package-lock.json
+yarn.lock

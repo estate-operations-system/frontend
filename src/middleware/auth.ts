@@ -1,27 +1,27 @@
 export default defineNuxtRouteMiddleware(async () => {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
     if (!token) {
-      return navigateTo('/');
+      return navigateTo('/')
     }
 
     const res = await fetch('https://backend-pl4x.onrender.com/api/auth/status', {
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       }
-    });
+    })
 
     if (!res.ok) {
-      return navigateTo('/');
+      return navigateTo('/')
     }
 
-    const data = await res.json();
+    const data = await res.json()
 
     if (!data.success || !data.authenticated) {
-      return navigateTo('/');
+      return navigateTo('/')
     }
   } catch (error) {
-    console.error('Auth middleware error:', error);
-    return navigateTo('/');
+    console.error('Auth middleware error:', error)
+    return navigateTo('/')
   }
-});
+})

@@ -1,30 +1,46 @@
 <template>
-    <div class="header">
-      <NuxtLink to="/" class="header__title">Estate Operations</NuxtLink>
-      <div v-if="isLoggedIn" class="header__links">
-        <NuxtLink to="/users" class="header__link">Пользователи</NuxtLink>
-        <NuxtLink to="/tickets" class="header__link">Заявки</NuxtLink>
-      </div>
-      <NuxtLink to="/profile" class="header__profile-button">
-        <EosAccountIcon/>
-      </NuxtLink>
+  <div class="header">
+    <NuxtLink
+      to="/"
+      class="header__title"
+      >Estate Operations</NuxtLink
+    >
+    <div
+      v-if="isLoggedIn"
+      class="header__links"
+    >
+      <NuxtLink
+        to="/users"
+        class="header__link"
+        >Пользователи</NuxtLink
+      >
+      <NuxtLink
+        to="/tickets"
+        class="header__link"
+        >Заявки</NuxtLink
+      >
     </div>
+    <NuxtLink
+      to="/profile"
+      class="header__profile-button"
+    >
+      <EosAccountIcon />
+    </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { useAuth } from "~/composables/useAuth";
-import { EosAccountIcon } from "eos-ui-kit";
+import { useAuth } from '~/composables/useAuth'
+import { EosAccountIcon } from 'eos-ui-kit'
 
-const router = useRouter();
-const { isLoggedIn } = useAuth();
+const { isLoggedIn } = useAuth()
 </script>
 
 <style lang="scss" scoped>
 .header {
   max-width: 1600px;
   margin: 0 auto;
-  padding: var(--eos-space-m) var(--eos-space-l);
+  padding: var(--eos-spacing-m) var(--eos-spacing-l);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,7 +68,7 @@ const { isLoggedIn } = useAuth();
 
   &__links {
     display: flex;
-    gap: var(--eos-space-xl);
+    gap: var(--eos-spacing-xl);
     align-items: center;
     position: absolute;
     left: 50%;

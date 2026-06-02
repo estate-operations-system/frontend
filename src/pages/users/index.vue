@@ -1,11 +1,20 @@
 <template>
-  <div class="users">
-    <PageTitle 
+  <Loader v-if="isLoading" />
+  <div
+    v-else
+    class="users"
+  >
+    <PageTitle
       :title="'Пользователи'"
       :subtitle="'Управление жильцами и их профилями'"
     />
 
-    <EosTable :columns="tableColumns" :rows="tableRows" clickable @rowClick="handleRowClick" />
+    <EosTable
+      :columns="tableColumns"
+      :rows="tableRows"
+      clickable
+      @row-click="handleRowClick"
+    />
   </div>
 </template>
 
@@ -18,13 +27,13 @@ import { EosTable } from 'eos-ui-kit'
 import type { TableColumn, TableRow } from 'eos-ui-kit'
 import PageTitle from '~/components/PageTitle.vue'
 
-type User = components["schemas"]["User"]
+type User = components['schemas']['User']
 
 const api = new ApiClient('https://backend-pl4x.onrender.com')
 const router = useRouter()
+const isLoading = ref(true)
 
 const users = ref<User[]>([])
-const loading = ref(true)
 const error = ref<string | null>(null)
 
 const tableColumns = computed<TableColumn[]>(() => [
@@ -34,7 +43,7 @@ const tableColumns = computed<TableColumn[]>(() => [
 ])
 
 const tableRows = computed<TableRow[]>(() =>
-  users.value.map(user => ({
+  users.value.map((user) => ({
     id: String(user.id),
     cells: [
       { id: 'name', data: user.name || '' },
@@ -55,7 +64,7 @@ onMounted(async () => {
   } catch (e: any) {
     error.value = e.message || 'Ошибка загрузки'
   } finally {
-    loading.value = false
+    isLoading.value = false
   }
 })
 </script>
@@ -64,7 +73,7 @@ onMounted(async () => {
 .users {
   display: flex;
   flex-direction: column;
-  gap: var(--eos-space-l);
+  gap: var(--eos-spacing-l);
   align-items: center;
 }
 </style>

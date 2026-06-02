@@ -3,15 +3,7 @@ import { useRouter } from 'vue-router'
 import { ApiClient } from '~/api/apiClient'
 import type { components } from '~/api/api'
 
-interface TelegramAuthData {
-  id: number
-  first_name: string
-  last_name?: string
-  username?: string
-  photo_url?: string
-  auth_date: number
-  hash: string
-}
+type User = components['schemas']['User']
 
 interface AuthResponse {
   success: boolean
@@ -33,7 +25,7 @@ export const useAuth = () => {
 
   const isLoading = ref(false)
   const errorMessage = ref<string | null>(null)
-  const user = ref<{ id?: number; name?: string; role?: string } | null>(null)
+  const user = ref<User | null>(null)
 
   const isLoggedIn = computed(() => {
     try {
@@ -43,25 +35,24 @@ export const useAuth = () => {
     }
   })
 
+  // Универсальная обертка для асинхронных операций
+  const withLoading = async <T>(fn: () => Promise<T>): Promise<T> => {
+    isLoading.value = true
+    errorMessage.value = null
+    try {
+      return await fn()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Operation failed'
+      errorMessage.value = message
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const getToken = (): string | null => {
     try {
       return localStorage.getItem(TOKEN_KEY)
-    } catch {
-      return null
-    }
-  }
-
-  const getRefreshToken = (): string | null => {
-    try {
-      return localStorage.getItem(REFRESH_TOKEN_KEY)
-    } catch {
-      return null
-    }
-  }
-
-  const getUserRole = (): string | null => {
-    try {
-      return localStorage.getItem(USER_ROLE_KEY)
     } catch {
       return null
     }
@@ -93,9 +84,16 @@ export const useAuth = () => {
     }
   }
 
+  const formatUserData = (data: any): User => {
+    if (!data) return data
+    return {
+      ...data,
+      phoneNumber: data.phoneNumber || data.phone_number
+    }
+  }
+
   const logout = async (): Promise<void> => {
-    isLoading.value = true
-    try {
+    return withLoading(async () => {
       removeToken()
       user.value = null
       try {
@@ -104,136 +102,64 @@ export const useAuth = () => {
         console.error('Failed to remove user role:', error)
       }
       await router.push('/')
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Logout failed'
-      errorMessage.value = message
-      throw error
-    } finally {
-      isLoading.value = false
-    }
+    })
   }
 
   const loadCurrentUser = async (): Promise<void> => {
-    try {
+    return withLoading(async () => {
       const token = getToken()
-      console.log('loadCurrentUser: token exists:', !!token)
       if (!token) return
 
-      const response = await apiClient.getUserById('me' as any) as any
-      console.log('loadCurrentUser response:', response)
+      const response = (await apiClient.getUserById('me' as any)) as any
       if (response?.data) {
-        user.value = response.data
-        console.log('Current user loaded:', response.data, 'role:', response.data.role)
+        user.value = formatUserData(response.data)
         if (response.data.role) {
           setUserRole(response.data.role)
         }
       }
-    } catch (error) {
-      console.error('Failed to load current user:', error)
-    }
+    })
   }
 
-  const authenticateWithTelegram = async (
-    telegramData: TelegramAuthData
-  ): Promise<AuthResponse> => {
-    isLoading.value = true
-    errorMessage.value = null
-
-    try {
-      const response = await apiClient.telegramAuth(telegramData) as any
-
-      if (response?.token && response?.refreshToken) {
-        setToken(response.token, response.refreshToken)
-        const userData = response.data || {}
-        user.value = userData
-        if (userData.role) {
-          setUserRole(userData.role)
-        }
-        // Load full user data with role
-        await loadCurrentUser()
-        return {
-          success: true,
-          token: response.token,
-          refreshToken: response.refreshToken,
-          user: userData,
-        }
-      } else {
-        throw new Error('Token not received from server')
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Authentication failed'
-      errorMessage.value = message
-      console.error('Telegram auth failed:', error)
-      throw error
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-   const sendRegistrationCode = async (
+  const sendRegistrationCode = async (
     email: string,
     name: string
   ): Promise<{ success: boolean; message: string }> => {
-    isLoading.value = true
-    errorMessage.value = null
-
-    try {
-      const response = await apiClient.sendRegistrationCode(email, name) as any
+    return withLoading(async () => {
+      const response = (await apiClient.sendRegistrationCode(email, name)) as any
 
       if (response?.success) {
         return {
           success: true,
-          message: response.message || 'Код отправлен на ваш email',
+          message: response.message || 'Код отправлен на ваш email'
         }
       } else {
         throw new Error(response?.error || 'Failed to send registration code')
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to send registration code'
-      errorMessage.value = message
-      console.error('Send registration code failed:', error)
-      throw error
-    } finally {
-      isLoading.value = false
-    }
+    })
   }
 
-  const sendLoginCode = async (
-    email: string
-  ): Promise<{ success: boolean; message: string }> => {
-    isLoading.value = true
-    errorMessage.value = null
-
-    try {
-      const response = await apiClient.sendLoginCode(email) as any
+  const sendLoginCode = async (email: string): Promise<{ success: boolean; message: string }> => {
+    return withLoading(async () => {
+      const response = (await apiClient.sendLoginCode(email)) as any
 
       if (response?.success) {
         return {
           success: true,
-          message: response.message || 'Код отправлен на ваш email',
+          message: response.message || 'Код отправлен на ваш email'
         }
       } else {
         throw new Error(response?.error || 'Failed to send login code')
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to send login code'
-      errorMessage.value = message
-      console.error('Send login code failed:', error)
-      throw error
-    } finally {
-      isLoading.value = false
-    }
+    })
   }
- const verifyRegistrationCode = async (
+
+  const verifyRegistrationCode = async (
     email: string,
     code: string,
     name: string
   ): Promise<AuthResponse> => {
-    isLoading.value = true
-    errorMessage.value = null
-
-    try {
-      const response = await apiClient.verifyRegistrationCode(email, code, name) as any
+    return withLoading(async () => {
+      const response = (await apiClient.verifyRegistrationCode(email, code, name)) as any
 
       if (response?.success && response?.token && response?.refreshToken) {
         setToken(response.token, response.refreshToken)
@@ -246,30 +172,17 @@ export const useAuth = () => {
           success: true,
           token: response.token,
           refreshToken: response.refreshToken,
-          user: userData,
+          user: userData
         }
       } else {
         throw new Error(response?.error || 'Registration verification failed')
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Registration verification failed'
-      errorMessage.value = message
-      console.error('Registration verification failed:', error)
-      throw error
-    } finally {
-      isLoading.value = false
-    }
+    })
   }
 
-  const verifyLoginCode = async (
-    email: string,
-    code: string
-  ): Promise<AuthResponse> => {
-    isLoading.value = true
-    errorMessage.value = null
-
-    try {
-      const response = await apiClient.verifyLoginCode(email, code) as any
+  const verifyLoginCode = async (email: string, code: string): Promise<AuthResponse> => {
+    return withLoading(async () => {
+      const response = (await apiClient.verifyLoginCode(email, code)) as any
 
       if (response?.success && response?.token && response?.refreshToken) {
         setToken(response.token, response.refreshToken)
@@ -282,23 +195,21 @@ export const useAuth = () => {
           success: true,
           token: response.token,
           refreshToken: response.refreshToken,
-          user: userData,
+          user: userData
         }
       } else {
         throw new Error(response?.error || 'Login verification failed')
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login verification failed'
-      errorMessage.value = message
-      console.error('Login verification failed:', error)
-      throw error
-    } finally {
-      isLoading.value = false
-    }
+    })
   }
 
-  const clearError = (): void => {
-    errorMessage.value = null
+  const initializeAuth = async () => {
+    return withLoading(async () => {
+      const token = getToken()
+      if (token) {
+        await loadCurrentUser()
+      }
+    })
   }
 
   return {
@@ -307,18 +218,15 @@ export const useAuth = () => {
     isLoading,
     errorMessage,
     getToken,
-    getRefreshToken,
-    getUserRole,
     setUserRole,
     setToken,
     removeToken,
     logout,
-    authenticateWithTelegram,
-    clearError,
     loadCurrentUser,
     sendRegistrationCode,
     sendLoginCode,
     verifyRegistrationCode,
-    verifyLoginCode
+    verifyLoginCode,
+    initializeAuth
   }
 }

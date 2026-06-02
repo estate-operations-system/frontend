@@ -1,6 +1,10 @@
 <template>
-  <div id="app" class="app" :class="{ 'app__home': isHomePage }">
-    <Header class="header"/>
+  <div
+    id="app"
+    class="app"
+    :class="{ app__home: isHomePage }"
+  >
+    <Header class="header" />
 
     <main class="app__content">
       <NuxtPage />
@@ -9,21 +13,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useAuth } from "~/composables/useAuth";
-import Header from "~/components/Header.vue";
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '~/composables/useAuth'
+import Header from '~/components/Header.vue'
 
-const router = useRouter();
-const { isLoggedIn, loadCurrentUser } = useAuth();
+const router = useRouter()
+const { isLoggedIn, loadCurrentUser } = useAuth()
 
-const isHomePage = computed(() => router.currentRoute.value.path === '/');
+const isHomePage = computed(() => router.currentRoute.value.path === '/')
 
 onMounted(async () => {
   if (isLoggedIn.value) {
     await loadCurrentUser()
   }
-});
+})
 </script>
 
 <style lang="scss">
@@ -36,7 +40,7 @@ html {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-top: var(--eos-space-m);
+  padding-top: var(--eos-spacing-m);
   font-family: 'Nunito', sans-serif;
 
   &__home {
@@ -48,7 +52,7 @@ html {
   }
 
   &__content {
-    padding-block: var(--eos-space-l);
+    padding-block: var(--eos-spacing-l);
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
